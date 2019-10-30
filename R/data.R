@@ -41,3 +41,26 @@ getPreprocessedData <- function(check=TRUE) {
   }
   
 }
+
+getRawData <- function(check=TRUE) {
+ 
+  folderfilename <- 'data/rawdata.zip'
+  
+  if (!check | !file.exists(folderfilename)) {
+    
+    url = as.character('https://osf.io/2p5bh/download')
+    
+    cat(sprintf("Downloading: 'rawdata.zip' from '%s'\n", url))
+    
+    download.file(url = url, 
+                  destfile = folderfilename, 
+                  method = 'auto', 
+                  quiet = FALSE, 
+                  mode = "wb")
+    
+  }
+  
+  unzip(zipfile = 'data/rawdata.zip', exdir = 'data/')
+  
+}
+
