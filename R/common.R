@@ -1,4 +1,10 @@
-#library('ez')
+
+source('R/learningcurves.R')
+source('R/reach_aftereffects.R')
+source('R/localization_shifts.R')
+source('R/localization_precision.R')
+
+# Participants and Styles -----
 
 getGroupParticipants <- function(group) {
   
@@ -14,6 +20,35 @@ getGroupParticipants <- function(group) {
 }
 
 
+getStyle <- function() {
+  
+  
+  # This is for plots for aging:
+  groups    =  c('sEDS', 
+                 'zEDS')
+  rotations =  c(30,
+                 30)
+  solidcolors =  c(rgb(229, 22,  54,  255, max = 255), 
+                   rgb(136, 153, 255, 255, max = 255))
+  
+  transcolors =  c(rgb(229, 22,  54,  47,  max = 255), 
+                   rgb(136, 153, 255, 47,  max = 255))
+  
+  linestyles = c(1,
+                 1)
+  labels <-    c('control',
+                 'EDS')
+  
+  
+  styles <- data.frame(groups,rotations,solidcolors,transcolors,linestyles,labels)
+  colnames(styles) <- c('group','rotation','color_solid','color_trans','linestyle','label')
+  
+  return(styles)
+  
+}
+
+# Descriptives and statistics -----
+
 t.interval = function(data, variance = var(data), conf.level = 0.95) {
   
   z = qt((1 - conf.level)/2, df = length(data) - 1, lower.tail = FALSE)
@@ -25,6 +60,85 @@ t.interval = function(data, variance = var(data), conf.level = 0.95) {
   
 }
 
+getConfidenceInterval <- function(data, variance = var(data), conf.level = 0.95, method='t-distr', resamples=1000, FUN=mean, returndist=FALSE) {
+  
+  if (method %in% c('t-distr','t')) {
+    
+    z = qt((1 - conf.level)/2, df = length(data) - 1, lower.tail = FALSE)
+    
+    xbar = mean(data)
+    sdx = sqrt(variance/length(data))
+    
+    return(c(xbar - z * sdx, xbar + z * sdx))
+    
+  }
+  
+  # add sample z-distribution?
+  
+  # for bootstrapping:
+  
+  if (method %in% c('bootstrap','b')) {
+    
+    data <- data[which(is.finite(data))] #need is.finite due to NA values
+    
+    samplematrix <- matrix(sample(data, size = resamples*length(data), replace = TRUE), nrow = resamples)
+    BS <- apply(samplematrix, c(1), FUN=FUN) 
+    
+    lo <- (1-conf.level)/2.
+    hi <- 1 - lo
+    
+    if (returndist) {
+      percentiles <- data.frame(percentile=seq(.01,.99,.01),value=quantile(BS, probs=seq(.01,.99,.01)))
+      densdist <- density(BS, bw='SJ', from=min(percentiles$value), to=max(percentiles$value))  
+      return(list('percentiles'=percentiles, 'density'=densdist, 'CI95'=quantile(BS, probs = c(lo,hi))))
+    } else {
+      return(quantile(BS, probs = c(lo,hi)))
+    }
+    
+  }
+  
+}
+
+
+etaSquaredTtest <- function(g1,g2=NA,na.rm=TRUE,mu=0) {
+  
+  doOneSample <- FALSE
+  doTwoSample <- FALSE
+  
+  if (length(g2) == 1) {
+    if (is.na(g2)) {
+      doOneSample <- TRUE
+    } else {
+      # set mu to the single value in g2 and do a one sample one anyway?
+    }
+  } else {
+    doTwoSample <- TRUE
+  }
+  
+  if (doOneSample) {
+    
+    # compare group 1 mean with mu as explanation
+    SStotal <- sum((g1-mean(g1,na.rm=na.rm))^2)
+    SSeffect <- sum(((mean(g1, na.rm=na.rm) - mu)^2)*length(g1))
+    # 
+    # 
+    return(SSeffect / SStotal)
+    
+  }
+  
+  if (doTwoSample) {
+    
+    overallmean <- mean(c(g1,g2),na.rm=na.rm)
+    # compare overall mean with group means as explanation
+    SStotal <- sum((c(g1,g2) - overallmean)^2, na.rm=na.rm)
+    SSeffect <- sum(length(g1)*(mean(g1,na.rm=na.rm)-overallmean)^2, length(g2)*(mean(g2,na.rm=na.rm)-overallmean)^2)
+    return(SSeffect / SStotal)
+    
+  }
+  
+}
+
+# Reach processing functions -----
 
 rotateTrajectory <- function(X,Y,angle) {
   
@@ -162,112 +276,12 @@ getTrialReachAngleAt <- function(trialdf, location='maxvel') {
   
 }
 
-getStyle <- function() {
-  
-  
-  # This is for plots for aging:
-  groups    =  c('sEDS', 
-                 'zEDS')
-  rotations =  c(30,
-                 30)
-  solidcolors =  c(rgb(229, 22,  54,  255, max = 255), 
-                   rgb(136, 153, 255, 255, max = 255))
-  #rgb(255, 128, 0,   255, max = 255),
-  #rgb(136, 0,   238, 255, max = 255)
-  #  
-  transcolors =  c(rgb(229, 22,  54,  47,  max = 255), 
-                   rgb(136, 153, 255, 47,  max = 255))
-  #rgb(255, 128, 0,   47,  max = 255), 
-  #rgb(136, 0,   238, 47,  max = 255)
-  #  
-  
-  linestyles = c(1,
-                 1)
-  labels <-    c('control',
-                 'EDS')
-  
-  
-  styles <- data.frame(groups,rotations,solidcolors,transcolors,linestyles,labels)
-  colnames(styles) <- c('group','rotation','color_solid','color_trans','linestyle','label')
-  
-  return(styles)
-  
-}
+# Preprocessing -----
 
-getConfidenceInterval <- function(data, variance = var(data), conf.level = 0.95, method='t-distr', resamples=1000, FUN=mean, returndist=FALSE) {
-  
-  if (method %in% c('t-distr','t')) {
-    
-    z = qt((1 - conf.level)/2, df = length(data) - 1, lower.tail = FALSE)
-    
-    xbar = mean(data)
-    sdx = sqrt(variance/length(data))
-    
-    return(c(xbar - z * sdx, xbar + z * sdx))
-    
-  }
-  
-  # add sample z-distribution?
-  
-  # for bootstrapping:
-  
-  if (method %in% c('bootstrap','b')) {
-    
-    data <- data[which(is.finite(data))] #need is.finite due to NA values
-    
-    samplematrix <- matrix(sample(data, size = resamples*length(data), replace = TRUE), nrow = resamples)
-    BS <- apply(samplematrix, c(1), FUN=FUN) 
-    
-    lo <- (1-conf.level)/2.
-    hi <- 1 - lo
-    
-    if (returndist) {
-      percentiles <- data.frame(percentile=seq(.01,.99,.01),value=quantile(BS, probs=seq(.01,.99,.01)))
-      densdist <- density(BS, bw='SJ', from=min(percentiles$value), to=max(percentiles$value))  
-      return(list('percentiles'=percentiles, 'density'=densdist, 'CI95'=quantile(BS, probs = c(lo,hi))))
-    } else {
-      return(quantile(BS, probs = c(lo,hi)))
-    }
-    
-  }
-  
-}
+# The code here doesn't do all the preprocessing, but calls that code.
 
-
-etaSquaredTtest <- function(g1,g2=NA,na.rm=TRUE,mu=0) {
+preprocessData <- function() {
   
-  doOneSample <- FALSE
-  doTwoSample <- FALSE
   
-  if (length(g2) == 1) {
-    if (is.na(g2)) {
-      doOneSample <- TRUE
-    } else {
-      # set mu to the single value in g2 and do a one sample one anyway?
-    }
-  } else {
-    doTwoSample <- TRUE
-  }
-  
-  if (doOneSample) {
-    
-    # compare group 1 mean with mu as explanation
-    SStotal <- sum((g1-mean(g1,na.rm=na.rm))^2)
-    SSeffect <- sum(((mean(g1, na.rm=na.rm) - mu)^2)*length(g1))
-    # 
-    # 
-    return(SSeffect / SStotal)
-    
-  }
-  
-  if (doTwoSample) {
-    
-    overallmean <- mean(c(g1,g2),na.rm=na.rm)
-    # compare overall mean with group means as explanation
-    SStotal <- sum((c(g1,g2) - overallmean)^2, na.rm=na.rm)
-    SSeffect <- sum(length(g1)*(mean(g1,na.rm=na.rm)-overallmean)^2, length(g2)*(mean(g2,na.rm=na.rm)-overallmean)^2)
-    return(SSeffect / SStotal)
-    
-  }
   
 }
