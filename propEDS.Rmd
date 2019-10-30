@@ -1,0 +1,120 @@
+---
+title: "Proprioceptive precision in EDS"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+Packages we want:
+```{r}
+
+library('ez')
+library('svglite')
+#library('afex')
+
+```
+
+
+Code we wrote and need:
+```{r}
+source('R/common.R')
+source('R/learningcurves.R')
+source('R/reach_aftereffects.R')
+source('R/localization_shifts.R')
+source('R/localization_precision.R')
+```
+
+
+# Adaptation in people with EDS and Controls
+
+Plot learning curves:
+```{r fig.width=8, fig.height=3}
+plotLearningCurves(target='inline')
+```
+
+So it looks like the people with EDS and the controls learn about as much and equally fast. But we'll put that to the test here.
+
+Learning curves ANOVA:
+```{r}
+learningCurveANOVA()
+```
+
+This ANOVA finds no difference between the two groups, nor an interaction between group and block. There is an effect of block. We interpret this to mean that both groups learned, and that there is no discernable difference in their rate or asymptotic level of learning.
+
+# Reach Aftereffects in people with EDS and Controls
+
+First a figure:
+```{r fig.width=8, fig.height=3}
+plotReachAftereffects(target='inline')
+```
+
+Now, we'll compare the aligned no-cursor deviations with those in the without strategy ("exclusive") no-cursor deviations after rotated training, in a mixed-design ANOVA with the between subjects factor _group_ (EDS or control) and the within subject factor _training_ (aligned or rotated).
+
+```{r}
+NoCursorANOVA()
+```
+
+There is an effect of training, but no effect of group and no interaction between group and training. We interpret this to mean that there is no discernable difference between the groups in their level of adaptation as measured by "without strategy" no-cursor reach deviations.
+
+Now, let's see if there is any effect of group (EDS or control) on the effect of doing no-cursor reaches with or without strategy:
+
+```{r}
+RAE.ANOVA()
+```
+
+There is indeed a weak interaction between group and strategy use (F(1,28)=4.52, p=.042, $\eta^2$=0.05). There seems to indeed be a small difference between the EDS and control groups in the reach aftereffects _with_ strategy, and we'll verify this. However, it doesn't seem like there is a (big) difference within each group between _with_ and _without_ strategy reach aftereffects, which we'll test now.
+
+```{r}
+NoCursorTtests()
+```
+
+Some people in the control group here were apparently able to develop a strategy given only a 30 degree rotation and no instruction (contrary to our earlier findings: Modchalingam et al., 2019). Perhaps a few people in the group of participants with EDS were also able to develop a strategy, but not so many that it caused a difference between the group averages in the _with_ and _without_ strategy conditions.
+
+**WHAT DOES THIS MEAN?**
+
+# Localization
+
+First a plot of the shifts in localization responses:
+
+```{r fig.width=8, fig.height=3}
+plotLocalizationShifts(target='inline')
+```
+
+Looks like there is an effect of training on localization (data in panels A & B seem different from 0). It also looks like there is no difference between the two groups (controls and people with EDS) in both the active and passive localization. It does seem like there is a difference between shifts in active and passive hand localization (data in panel C is somewhat different from 0), but it's unclear if there is a group difference there. Let's run a bunch of ANOVA's:
+
+```{r}
+localizationAOV()
+```
+
+This mostly confirms what the figure shows: effects of training on localization, a difference between active and passive localization, but no effects of group. There is one oddity: the effect of passive vs. active localization interacts with the effect of hand angle in the omnibus ANOVA.
+
+# Localization precision
+
+Now the interesting part. We've mostly not seen any differences between the two groups which is what we expected. The exception is the _with strategy_ reach aftereffects, but for the current study, the more important issue is that there were no group effects on any of the localization measures. The question is if using this fast method of assessing proprioceptive recalibration we find the same effect as earlier (Clayton et al., XXXX) [@Clayton1234]: that people with EDS have larger/smaller proprioceptive precision. (The wider confidence interval in the group of people with EDS in the difference between active and passive localization shifts may be due to differences between individuals localization shifts, but not their proprioceptive hand localization precision.)
+
+After subtracting a smoothed spline fit to each individual participants localization errors across hand angles, in each of the 4 conditions, which should factor out individual levels of accuracy, we are then left with the precision of their responses in all 4 conditions. Of those we take the variance, but for frequentist stats, it is more useful to use the standard deviation (as it gets the data more or less normally distributed), so we convert the variance to standard deviation before doing statistics.
+
+Here are the standard deviations (square root of the variance) as our measure of precision of localization, for both the control group (in red) and the people with EDS (in blue). In panel A we see means and an estimate confidence interval assuming the data comes from a sample t-distribution. On the right is the localization precision in the aligned session, on the right in the rotated session. The continuous line is for active localization and the dashed line for passive. In panels B and C the individual data and the bootstrapped confidence interval are shown. Panel B is for the aligned session, and panel C for the rotated session. Each shows active (left) and passive (right) localization precision, for both the control group (red) and the group of participants with EDS (blue). 
+
+```{r fig.width=8, fig.height=3}
+plotLocalizationVariance()
+```
+
+In the figure it appears that localization is less precise in the group of people with EDS as compared with the control group.
+
+Let's test this. Below is a mixed-design ANOVA on the standard deviation of localization, when using the group (control or EDS) as between-subjects factor and passive/active as well as aligned/rotated as within-subject factors.
+
+```{r}
+localizationSTD.ANOVA()
+```
+
+There is a main effect of group as well as a main effect of passive versus active localization, but there are no higher order effects. Let's do some one-sided t-tests to look into our hypothesis. One-sided, because we think that people with EDS should be less precise in localizing their hand:
+
+```{r}
+localicalizationSTDt.tests()
+```
+
+So apart from in aligned & active localization, people with EDS are indeed less precise in localizing their hand as compared to age-matched controls without EDS.
