@@ -3,30 +3,17 @@ source('R/common.R')
 # Data handling -----
 
 getLearningCurves <- function(groups = c('sEDS','zEDS')) {
-  #participants <- read.csv('../data/participants_files.csv')
-  
-  # three groups: 30 implicit, 30 explicit and cursorjump
-  # groups <- c('30implicit', '30explicit', 'cursorjump', '60implicit', '60explicit')
-  
-  # Make an array for the data we want to plot.
-  # A central value for the 90 trials of rotated training, ...
-  # across all participant in each of the three groups.
-  # The central value I think will be the median of the reach direction at 3 cm - or 4 cm?
-  learningcurves <- array(data=NA,dim=c(90,3))
   
   for (groupno in 1:length(groups)) {
-    # this should return an dataframe of size (90,N)
+    
     grouplearningcurves = getGroupLearningCurves(groups[groupno])
-    # save this array to a file, so Nonna can do stats on it
+    
     filename <- sprintf('data/%s_curves.csv',groups[groupno])
+    
     write.csv(filename,x=grouplearningcurves,row.names=FALSE,quote=FALSE)
     
-    #learningcurves[,groupno] <- median(as.matrix(grouplearningcurves),na.rm=TRUE)
-    # learningcurves[,groupno] <- apply(as.matrix(grouplearningcurves),c(2),median,na.rm=TRUE)
   }
-  
-  # return(learningcurves)
-  
+
 }
 
 getGroupLearningCurves<- function(group) {
@@ -256,142 +243,11 @@ getReachAngles <- function(filename) {
 }
 
 
-# plotLearningCurves <- function() {
-#   
-#   styles <- getStyle()
-#   
-#   relfontsize <- 1.0 # 0.7
-#   
-#   par(mfrow=c(2,2), family='Arial', mar=c(4,4,0.5,0.2))
-#   # or have more control with 'layout()'?
-#   
-#   # 'raw' data - panel A
-#   ylims=c(-.2*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
-#   
-#   plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n')
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     group <- styles$group[groupno]
-#     curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
-#     
-#     CI <- apply(curves,1,t.interval)
-#     
-#     CIinitial <- CI[,1:15]
-#     CIfinal <- CI[,76:90]
-#     
-#     Xi <- c(c(1:15),rev(c(1:15)))
-#     Yi <- c(CIinitial[1,],rev(CIinitial[2,]))
-#     
-#     Xf <- c(c(21:35),rev(c(21:35)))
-#     Yf <- c(CIfinal[1,],rev(CIfinal[2,]))
-#     
-#     kleur <- rgb(t(col2rgb(styles$color[groupno])/255),alpha=0.2)
-#     polygon(Xi,Yi,col=kleur,border=NA)
-#     polygon(Xf,Yf,col=kleur,border=NA)
-#     
-#   }  
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     group <- styles$group[groupno]
-#     curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
-#     
-#     curve <- lapply(data.frame(t(curves)),mean,na.rm=TRUE)
-#     
-#     lines(c(1:15),curve[1:15],col=as.character(styles$color[groupno]),lty=styles$linestyle[groupno],lw=2)
-#     
-#     lines(c(21:35),curve[76:90],col=as.character(styles$color[groupno]),lty=styles$linestyle[groupno],lw=2)
-#   }
-#   
-#   # axis(side=1, at=c(1,10,20,30))
-#   axis(side=1, at=c(1,5,10,25,30,35), labels=c('1','5','10','80','85','90'),cex.axis=relfontsize)
-#   if (max(styles$rotation) == 60) {
-#     axis(side=2, at=c(0,15,30,45,60),cex.axis=relfontsize)
-#   }
-#   if (max(styles$rotation) == 30) {
-#     axis(side=2, at=c(0,10,20,30),cex.axis=relfontsize)
-#   }
-#   
-#   # normalized curves - panel B
-#   
-#   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=c(-.2,1.2),xlab='trial set',ylab='normalized adaptation',xaxt='n',yaxt='n',bty='n')
-#   
-#   blockdefs <- list(c(1,3),c(4,3),c(76,15))
-#   
-#   alllines <- array(NA,dim=c(length(styles$group),length(blockdefs)))
-#   allpolys <- array(NA,dim=c(length(styles$group),2*length(blockdefs)))
-#   
-#   
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     group <- styles$group[groupno]
-#     curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
-#     
-#     # R <- dim(curves)[1] # should always be 90
-#     N <- dim(curves)[2]
-#     
-#     blocked <- array(NA, dim=c(N,length(blockdefs)))c
-#     
-#     for (ppno in c(1:N)) {
-#       
-#       for (blockno in c(1:length(blockdefs))) {
-#         
-#         blockdef <- blockdefs[[blockno]]
-#         blockstart <- blockdef[1]
-#         blockend <- blockstart + blockdef[2] - 1
-#         samples <- curves[blockstart:blockend,ppno]
-#         blocked[ppno,blockno] <- mean(samples, na.rm=TRUE)
-#         
-#       }
-#       
-#     }
-#     
-#     alllines[groupno,] <- as.numeric(lapply(data.frame(blocked)/styles$rotation[groupno],mean,na.rm=TRUE))
-#     
-#     for (blockno in c(1:length(blockdefs))) {
-#       
-#       CI <- t.interval(blocked[is.finite(blocked[,blockno]),blockno]/styles$rotation[groupno])
-#       allpolys[groupno,blockno] <- CI[1]
-#       allpolys[groupno,(2*length(blockdefs))-blockno+1] <- CI[2]
-#       
-#     }
-#     
-#   }
-#   
-#   # first plot all the polygons representing confidence intervals, so those are in the background
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     polX <- c(c(1,2,4),rev(c(1,2,4)))
-#     polY <- allpolys[groupno,]
-#     kleur <- rgb(t(col2rgb(styles$color[groupno])/255),alpha=0.2)
-#     polygon(polX,polY,col=kleur,border=NA)
-#     
-#   }
-#   
-#   # then plot the lines representing the means, so those are in the foreground
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     lines(c(1,2,4),alllines[groupno,],col=as.character(styles$color[groupno]),lty=styles$linestyle[groupno],lw=2)
-#     
-#   }
-#   
-#   legend(2,0.45,styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.7)
-#   
-#   axis(side=1, at=c(1,2,4), labels=c('1-3','4-6','76-90'),cex.axis=relfontsize)
-#   axis(side=2, at=c(0,.5,1),cex.axis=relfontsize)
-#   
-# }
-
 
 getBlockedLearningCurves <- function(group, blockdefs) {
   
   curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
   
-  # R <- dim(curves)[1] # should always be 90
   N <- dim(curves)[2]
   
   blocked <- array(NA, dim=c(N,length(blockdefs)))
@@ -405,11 +261,7 @@ getBlockedLearningCurves <- function(group, blockdefs) {
       blockend <- blockstart + blockdef[2] - 1
       samples <- curves[blockstart:blockend,ppno]
       blocked[ppno,blockno] <- mean(samples, na.rm=TRUE)
-      #if (ppno == N) {
-        #print(samples)
-        #mean(samples, na.rm=TRUE)
-      #}
-      
+
     }
     
   }
@@ -419,143 +271,6 @@ getBlockedLearningCurves <- function(group, blockdefs) {
 }
 
 # Figures -----
-
-# plotLearningCurves <- function(target='inline') {
-#   
-#   styles <- getStyle()
-#   
-#   if (target == 'svg') {
-#     svglite(file='doc/Fig3.svg', width=7.5, height=3, system_fonts=list(sans='Arial'))
-#   }
-#   
-#   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
-#   par(mar=c(4,4,2,0.1))
-#   
-#   
-#   layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(3,2,2), heights=c(1,1))
-#   
-#   # # # # # # # # # #
-#   # panel A: actual learning curves
-#   
-#   ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
-#   plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
-#   
-#   mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     group  <- styles$group[groupno]
-#     curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
-#     curve  <- apply(curves, c(1), median, na.rm=T)
-#     
-#     lines(c(1:15),curve[1:15],col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
-#     
-#     lines(c(21:35),curve[76:90],col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
-#   }
-#   
-#   # axis(side=1, at=c(1,10,20,30))
-#   axis(side=1, at=c(1,5,10,25,30,35), labels=c('1','5','10','80','85','90'),cex.axis=0.85)
-#   axis(side=2, at=c(0,10,20,30),cex.axis=0.85)
-#   
-#   legend(20,15,styles$label,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.60,seg.len=3)
-#   
-#   
-#   # # # # # # # # # #
-#   # panel B: blocked learning curves
-#   
-#   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
-#   
-#   mtext('B', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
-#   
-#   blockdefs <- list(c(1,3),c(4,3),c(76,15))
-#   
-#   alllines <- array(NA,dim=c(length(styles$group),length(blockdefs)))
-#   allpolys <- array(NA,dim=c(length(styles$group),2*length(blockdefs)))
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#   #for (groupno in c(2)) {
-#     
-#     group <- styles$group[groupno]
-#     
-#     blocked <- getBlockedLearningCurves(group, blockdefs)
-#     #print(blocked)
-#     
-#     alllines[groupno,] <- apply(blocked, c(2), mean, na.rm=T)
-#     
-#     blockedCI <- apply(blocked, c(2), t.interval)
-#     allpolys[groupno,] <- c(blockedCI[1,], rev(blockedCI[2,]))
-#     
-#   }
-#   
-#   # first plot all the polygons representing confidence intervals, so those are in the background
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     polX <- c(c(1,2,4),rev(c(1,2,4)))
-#     polY <- allpolys[groupno,]
-#     polygon(polX,polY,col=as.character(styles$color_trans[groupno]),border=NA)
-#     
-#   }
-#   
-#   # then plot the lines representing the means, so those are in the foreground
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     lines(c(1,2,4),alllines[groupno,],col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
-#     
-#   }
-#   
-#   # legend(2,0.45,styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.7)
-#   
-#   axis(side=1, at=c(1,2,4), labels=c('1-3','4-6','76-90'),cex.axis=0.85)
-#   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
-#   
-#   
-#   # # # # # # # # # #
-#   # panel C: individual participants in the first trial set
-#   
-#   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
-#   
-#   mtext('C', side=3, outer=TRUE, at=c(5/7,1), line=-1, adj=0, padj=1)
-#   
-#   blockdefs <- list(c(1,3))
-#   
-#   for (groupno in c(1:length(styles$group))) {
-#     
-#     group <- styles$group[groupno]
-#     
-#     blocked <- getBlockedLearningCurves(group, blockdefs)
-#     
-#     X <- rep((groupno-(1/3)),length(blocked))
-#     Y <- c(blocked)
-#     points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
-#     
-#     meandist <- getConfidenceInterval(data=c(blocked), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
-#     
-#     DX <- meandist$density$x
-#     DY <- meandist$density$y / max(meandist$density$y) / 2.5
-#     
-#     DX <- c(DX[1], DX, DX[length(DX)])
-#     DY <- c(0,     DY, 0)
-#     
-#     polygon(x=DY+groupno, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
-#     
-#     lines(x=rep(groupno,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
-#     #print(meandist$CI95)
-#     points(x=groupno,y=mean(c(blocked),na.rm=TRUE),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
-#     
-#   }
-#   
-#   
-#   axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
-#   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
-#   
-#   
-#   if (target == 'svg') {
-#     dev.off()
-#   }
-#   
-# }
 
 plotLearningCurves <- function(target='inline') {
   
