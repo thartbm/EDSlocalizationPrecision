@@ -1,10 +1,10 @@
 ---
 title: "Proprioceptive precision in EDS"
 output:
-  word_document: default
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
+  word_document: default
 ---
 
 
@@ -25,8 +25,47 @@ source('R/learningcurves.R')
 source('R/reach_aftereffects.R')
 source('R/localization_shifts.R')
 source('R/localization_precision.R')
+source('R/data.R')
 ```
 
+For this notebook, we can download pre-processed data files from OSF, but you can choose to download the raw data, and run / check / change pre-processing functions yourself. To do that change the variable 
+
+```{r}
+
+usePreprocessed <- TRUE
+#usePreprocessed <- FALSE
+
+if (usePreprocessed) {
+  
+  getPreprocessedData()
+  
+} else {
+  
+  getPreprocessedData(participantsOnly=TRUE)
+  
+  # This function is from data.R and downloads and unzips a zip file with the raw data:
+  getRawData()
+  
+  # This function is from learningcurves.R and creates the pre-processed learning-curve files:
+  getLearningCurves()
+  
+  # This function is from reach_aftereffects.R creates the nocursors / reachaftereffect files:
+  getAllNoCursors()
+  
+  
+  # The following functions are from localization_shifts.R.
+  # This one creates the corrected [group_]localization.csv files:
+  getLocalization()
+  # This one calculates 95% confidence intervals for plotting:
+  getLocalizationTdistributionConfidenceIntervals()
+  # This one creates the loc_AOV files to do statistics on:
+  getLocalizationForANOVA()
+  
+  # This function is from localization_precision.R and creates the files with participants' localization variance:
+  getLocalizationVariance()  
+  
+}
+```
 
 # Adaptation in people with EDS and Controls
 
