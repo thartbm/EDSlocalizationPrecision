@@ -1,9 +1,4 @@
 
-source('R/learningcurves.R')
-source('R/reach_aftereffects.R')
-source('R/localization_shifts.R')
-source('R/localization_precision.R')
-
 # Participants and Styles -----
 
 getGroupParticipants <- function(group) {
@@ -273,15 +268,5 @@ getTrialReachAngleAt <- function(trialdf, location='maxvel') {
   reachangle[1,2] <- angle
   
   return(reachangle)
-  
-}
-
-# Preprocessing -----
-
-# The code here doesn't do all the preprocessing, but calls that code.
-
-preprocessData <- function() {
-  
-  
   
 }
