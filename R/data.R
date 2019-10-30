@@ -1,5 +1,5 @@
 
-getPreprocessedData <- function(check=TRUE) {
+getPreprocessedData <- function(check=TRUE,participantsOnly=FALSE) {
   
   cat('Checking if all data is available locally.\n')
   
@@ -21,6 +21,13 @@ getPreprocessedData <- function(check=TRUE) {
                   'zEDS_nocursors.csv'        = 'https://osf.io/wgnfq/download'
     
   )
+  
+  if (participantsOnly) {
+    
+    data_files <- c('participants.csv'          = 'https://osf.io/6xpag/download',
+                    'participants_files.csv'    = 'https://osf.io/xs6g5/download')
+    
+  }
   
   for (filename in names(data_files)) {
     
