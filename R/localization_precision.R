@@ -58,52 +58,8 @@ detrendLocalization <- function(groups=c('sEDS','zEDS')) {
 
 getLocalizationVariance <- function() {
   
-  DetLoc <- detrendLocalization()
-  
-  for (group in names(DetLoc)) {
-    
-    loc <- DetLoc[[group]]
-    
-    participant <- c()
-    rotated <- c()
-    passive <- c()
-    variance <- c()
-    
-    participants <- unique(loc$participant)
-      
-    for (pp in participants) {
-        
-      for (rot in c(0,1)) {
-          
-        for (pas in c(0,1)) {
-            
-          idx <- which(loc$participant == pp & loc$rotated == rot & loc$passive == pas)
-            
-          subdf <- loc[idx,]
-          pcVar <- var(subdf$tap_error - subdf$predicted_error)
-            
-          participant <- c(participant, pp)
-          rotated     <- c(rotated,     rot)
-          passive     <- c(passive,     pas)
-          variance    <- c(variance,    pcVar)
-            
-        }
-        
-      }
-        
-    }
-
-    groupVar <- data.frame(participant, rotated, passive, variance)
-    
-    # WRITE CSVs!
-    write.csv(groupVar,file=sprintf('data/%s_localization_var.csv',group),row.names=FALSE,quote=FALSE)
-    
-  }
-  
-}
-
-getOverallLocalizationVariance <- function() {
-  
+  # detrend the localization responses, so we get rid of biases
+  # and only have variance around this bias:
   DetLoc <- detrendLocalization()
   
   allVar <- NA
@@ -112,34 +68,32 @@ getOverallLocalizationVariance <- function() {
     
     loc <- DetLoc[[group]]
     
-    participant <- c()
-    variance <- c()
+    # get variance split up by condition:
+    loc$variance <- loc$tap_error - loc$predicted_error
+    groupVar <- aggregate(variance ~ rotated + passive + participant, data = loc, FUN=var)
     
-    participants <- unique(loc$participant)
+    # write this to csv:
+    write.csv(groupVar,file=sprintf('data/%s_localization_var.csv',group),row.names=FALSE,quote=FALSE)
     
-    for (pp in participants) {
-      
-      idx <- which(loc$participant == pp)
-          
-      subdf <- loc[idx,]
-      pcVar <- var(subdf$tap_error - subdf$predicted_error)
-          
-      participant <- c(participant, pp)
-      variance    <- c(variance,    pcVar)
-      
-    }
-    
+    # also get generic variance per participant:
     if (is.data.frame(allVar)) {
-      allVar <- rbind(allVar, data.frame(participant, variance, group))
+      allVar <- rbind(allVar, aggregate(variance ~ participant, data = loc, FUN=var))
     } else {
-      allVar <- data.frame(participant, variance, group)
+      allVar <- aggregate(variance ~ participant, data = loc, FUN=var)
     }
-
+    
   }
   
-  return(rbind(allVar))
+  participants <- read.csv('data/participants.csv', stringsAsFactors = FALSE)
+  participants <- participants[order(participants$ID),]
+  
+  allVar <- cbind(allVar[order(allVar$participant),], participants[,c('Beighton','folder','age','sex','type')])
+  
+  write.csv(allVar,file=sprintf('data/all_localization_var.csv',group),row.names=FALSE,quote=FALSE)
   
 }
+
+
 
 
 # Plots -----
@@ -323,8 +277,58 @@ plotLocalizationVariance <- function(target='inline') {
   
   axis(side=1, at=c(1.5,3.5), labels=c('active','passive'))
   
+  if (target == 'svg') {
+    dev.off()
+  }
+  
     
 }
+
+plotBeightonLocSTD <- function(target='inline') {
+  
+  styles <- getStyle()
+  
+  locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
+  locSTD$std <- sqrt(locSTD$variance)
+  
+  if (target == 'svg') {
+    svglite::svglite(file='doc/Fig7.svg', width=4, height=3, system_fonts=list(sans='Arial'))
+  }
+  
+  plot(-1000,-1000,main='[shorter main title?]',xlab='Beighton score',ylab='localization std',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F)
+  
+  myLinReg <- lm(std ~ Beighton, data=locSTD)
+  Xh <- seq(0,9,.01)
+  LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
+  
+  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#DDDDDD', border=NA)
+  
+  lines(x=Xh,y=LRfit[,'fit'], col='#000000')
+  
+  for (group_no in c(1:length(styles$group))) {
+    
+    group <- styles$group[group_no]
+    
+    subdf <- locSTD[which(locSTD$folder == group),]
+    
+    col <- as.character(styles$color_solid[group_no])
+    
+    points(subdf$Beighton, subdf$std, col=col, cex=1, pch=1)
+    
+  }
+  labels <- c(as.character(styles$label), 'linear regression')
+  colors <- c(as.character(styles$color_solid), '#000000')
+  legend(0, 15, labels, col=colors, bty='n', cex=0.85, lw=1, seg.len = 1)
+  
+  axis(1,seq(0,9,3))
+  axis(2,seq(0,15,5))
+  
+  if (target == 'svg') {
+    dev.off()
+  }
+  
+}
+
 
 # Statistics -----
 
@@ -369,6 +373,31 @@ localicalizationSTDt.tests <- function() {
   
 }
 
+
+correlateBeightonLocSTD <- function() {
+  
+  locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
+  locSTD$std <- sqrt(locSTD$variance)
+    
+  print(cor.test(locSTD$std, locSTD$Beighton))
+  
+}
+
+predictGroupBYlocvar <- function() {
+  
+  locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
+  
+  locSTD$std <- sqrt(locSTD$variance)
+  
+  locSTD$group <- locSTD$type
+  locSTD$group[which(locSTD$group != 'control')] <- 'EDS'
+  locSTD$group <- as.factor(locSTD$group)
+  
+  mylogit <- glm(group ~ std, data = locSTD, family = "binomial")
+  summary(mylogit)
+  
+}
+
 localizationSTDlogreg <- function() {
   
   SlocVar <- read.csv('data/sEDS_localization_var.csv', stringsAsFactors = FALSE)
@@ -379,77 +408,20 @@ localizationSTDlogreg <- function() {
   locVar <- rbind(SlocVar, ZlocVar)
   locVar$std <- sqrt(locVar$var)
   
-  locVar <- locVar[which(locVar$rotated == 0 & locVar$passive == 1),]
-  
   locVar$group <- as.factor(locVar$group)
-  
-  mylogit <- glm(group ~ std, data = locVar, family = "binomial")
-  summary(mylogit)
-  
-}
-
-correlateBeightonPropVar <- function() {
-  
-  styles <- getStyle()
-  
-  SlocVar <- read.csv('data/sEDS_localization_var.csv', stringsAsFactors = FALSE)
-  SlocVar$group <- 'control'
-  ZlocVar <- read.csv('data/zEDS_localization_var.csv', stringsAsFactors = FALSE)
-  ZlocVar$group <- 'EDS'
-  
-  locVar <- rbind(SlocVar, ZlocVar)
-  locVar$std <- sqrt(locVar$var)
-  
-  participants <- read.csv('data/participants.csv', stringsAsFactors = FALSE)
-  participants <- participants[order(participants$ID),]
-  
-  
-  locSTD <- NA
   
   for (rotated in c(0,1)) {
     
     for (passive in c(0,1)) {
       
-      locVarPart <- locVar[which(locVar$rotated == rotated & locVar$passive == passive),]
-      locVarPart <- locVarPart[order(locVarPart$participant),]
-      locVarPart <- cbind(locVarPart, participants)
+      mylogit <- glm(group ~ std, data = locVar[which(locVar$rotated == rotated & locVar$passive == passive),], family = "binomial")
       
-      if (is.data.frame(locSTD)) {
-        locSTD <- rbind(locSTD, locVarPart)
-      } else {
-        locSTD <- locVarPart
-      }
+      cat(sprintf('Predict group from localization variance in %s, %s localization:\n', c('ALIGNED','ROTATED')[rotated+1], c('ACTIVE','PASSIVE')[passive+1]))
+      
+      print(summary(mylogit))
       
     }
     
   }
   
-  print(cor.test(locSTD$std, locSTD$Beighton))
-  
-  plot(-1000,-1000,xlab='Beighton score',ylab='localization std',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F)
-
-  myLinReg <- lm(std ~ Beighton, data=locSTD)
-  Xh <- seq(0,9,.01)
-  LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
-  
-  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#DDDDDD', border=NA)
-  
-  lines(x=Xh,y=LRfit[,'fit'], col='#000000')
-  
-  for (group_no in c(1:length(styles$group))) {
-    
-    group <- styles$group[group_no]
-    
-    subdf <- locSTD[which(locSTD$folder == group),]
-    
-    col <- as.character(styles$color_solid[group_no])
-    
-    points(subdf$Beighton, subdf$std, col=col, cex=2)
-    
-  }
-  
-  axis(1,seq(0,9,3))
-  axis(2,seq(0,15,5))
-  
-
 }
