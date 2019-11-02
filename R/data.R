@@ -1,10 +1,11 @@
 
 getPreprocessedData <- function(check=TRUE,participantsOnly=FALSE) {
   
-  cat('Checking if all data is available locally.\n')
+  cat('Making sure pre-processed data is available locally:\n')
   
   data_files <- c('participants.csv'          = 'https://osf.io/6xpag/download',
                   'participants_files.csv'    = 'https://osf.io/xs6g5/download',
+                  'all_localization_var.csv'  = 'https://osf.io/nrfq5/download',
                   
                   'sEDS_curves.csv'           = 'https://osf.io/tv46u/download',
                   'sEDS_loc_AOV.csv'          = 'https://osf.io/3bxnh/download',
@@ -43,6 +44,10 @@ getPreprocessedData <- function(check=TRUE,participantsOnly=FALSE) {
       
       write.csv(df,folderfilename,row.names=FALSE,quote=FALSE)
       
+    } else {
+      
+      cat(sprintf("File exists: '%s', not downloading.\n", filename))
+      
     }
     
   }
@@ -64,6 +69,10 @@ getRawData <- function(check=TRUE) {
                   method = 'auto', 
                   quiet = FALSE, 
                   mode = "wb")
+    
+  } else {
+    
+    cat('"rawdata.zip" already present.\n')
     
   }
   
