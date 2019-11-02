@@ -157,3 +157,37 @@ localicalizationSTDt.tests()
 ```
 
 So apart from in aligned & active localization, people with EDS are indeed less precise in localizing their hand as compared to age-matched controls without EDS.
+
+It also seems that the difference between active and passive is mostly the same within all conditions and groups. But, as mentioned, for the EDS group, active localization after aligned training might be more precise (lower variance) than in the other three conditions. Perhaps before changing it up with adaptation, the signal from predicted sensory consequences provides enough extra information to make a difference for hand location estimation.
+
+# EDS indicators and hand localization precision
+
+So if the precision of limb localization is lower in the EDS group, then perhaps there is a relationship between EDS indicators and the precision of limb localization. We use Beighton scores as a hypermobility index, measured in both groups, and test if this is correlated with overall localization variance (variance is now calculated across all 4 conditions for every participant - providing more power). First, let's plot this data, with a linear regression:
+
+```{r fig.width=4, fig.height=3}
+plotBeightonLocSTD()
+```
+
+This looks like there is some relationship between the two variables, and this is confirmed by a Pearson correlation:
+
+```{r}
+correlateBeightonLocSTD()
+```
+
+# Predict EDS from hand localization precision
+
+This raises the question of whether or not EDS can be predicted from hand localization variance. Using the localization variance calculated across all 4 conditions works to some extent:
+
+```{r}
+predictGroupBYlocvar()
+```
+
+Although I'm not using a training/test data split here which would be more appropriate, and perhaps we can make use of some other predictors as well (e.g. train a random forest that can make use of localization variance, and compare it to one that can not use localization variance), but all of this would require a lot more data (participants).
+
+We can explore one issue with such a test: it would be best if it were cheap / easy to do. Training on a visuomotor rotation takes time, so the data from the rotated session might not be useful. Additionally, the passive localization requqires an expensive piece of equipment, which may be prohibitive. Therefore we should test how well predicting the group (people with EDS vs. controls) from localization variance works within each of the four hand localization conditions:
+
+```{r}
+localizationSTDlogreg()
+```
+
+Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting. This is still done without training/test datasplits, and still ignores co-predictors, that would reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull predictor of EDS.
