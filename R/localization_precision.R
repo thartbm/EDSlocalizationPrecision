@@ -102,6 +102,46 @@ getLocalizationVariance <- function() {
   
 }
 
+getOverallLocalizationVariance <- function() {
+  
+  DetLoc <- detrendLocalization()
+  
+  allVar <- NA
+  
+  for (group in names(DetLoc)) {
+    
+    loc <- DetLoc[[group]]
+    
+    participant <- c()
+    variance <- c()
+    
+    participants <- unique(loc$participant)
+    
+    for (pp in participants) {
+      
+      idx <- which(loc$participant == pp)
+          
+      subdf <- loc[idx,]
+      pcVar <- var(subdf$tap_error - subdf$predicted_error)
+          
+      participant <- c(participant, pp)
+      variance    <- c(variance,    pcVar)
+      
+    }
+    
+    if (is.data.frame(allVar)) {
+      allVar <- rbind(allVar, data.frame(participant, variance, group))
+    } else {
+      allVar <- data.frame(participant, variance, group)
+    }
+
+  }
+  
+  return(rbind(allVar))
+  
+}
+
+
 # Plots -----
 
 plotLocalizationVariance <- function(target='inline') {
@@ -345,4 +385,71 @@ localizationSTDlogreg <- function() {
   
   mylogit <- glm(group ~ std, data = locVar, family = "binomial")
   summary(mylogit)
+  
+}
+
+correlateBeightonPropVar <- function() {
+  
+  styles <- getStyle()
+  
+  SlocVar <- read.csv('data/sEDS_localization_var.csv', stringsAsFactors = FALSE)
+  SlocVar$group <- 'control'
+  ZlocVar <- read.csv('data/zEDS_localization_var.csv', stringsAsFactors = FALSE)
+  ZlocVar$group <- 'EDS'
+  
+  locVar <- rbind(SlocVar, ZlocVar)
+  locVar$std <- sqrt(locVar$var)
+  
+  participants <- read.csv('data/participants.csv', stringsAsFactors = FALSE)
+  participants <- participants[order(participants$ID),]
+  
+  
+  locSTD <- NA
+  
+  for (rotated in c(0,1)) {
+    
+    for (passive in c(0,1)) {
+      
+      locVarPart <- locVar[which(locVar$rotated == rotated & locVar$passive == passive),]
+      locVarPart <- locVarPart[order(locVarPart$participant),]
+      locVarPart <- cbind(locVarPart, participants)
+      
+      if (is.data.frame(locSTD)) {
+        locSTD <- rbind(locSTD, locVarPart)
+      } else {
+        locSTD <- locVarPart
+      }
+      
+    }
+    
+  }
+  
+  print(cor.test(locSTD$std, locSTD$Beighton))
+  
+  plot(-1000,-1000,xlab='Beighton score',ylab='localization std',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F)
+
+  myLinReg <- lm(std ~ Beighton, data=locSTD)
+  Xh <- seq(0,9,.01)
+  LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
+  
+  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#DDDDDD', border=NA)
+  
+  lines(x=Xh,y=LRfit[,'fit'], col='#000000')
+  
+  for (group_no in c(1:length(styles$group))) {
+    
+    group <- styles$group[group_no]
+    
+    subdf <- locSTD[which(locSTD$folder == group),]
+    
+    col <- as.character(styles$color_solid[group_no])
+    
+    points(subdf$Beighton, subdf$std, col=col, cex=2)
+    
+  }
+  
+  axis(1,seq(0,9,3))
+  axis(2,seq(0,15,5))
+  
+
 }
