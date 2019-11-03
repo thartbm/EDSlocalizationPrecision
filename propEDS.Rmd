@@ -170,7 +170,7 @@ After subtracting a smoothed spline fit to each individual participants localiza
 Here are the standard deviations (square root of the variance) as our measure of precision of localization, for both the control group (in red) and the people with EDS (in blue). In panel A we see means and an estimate confidence interval assuming the data comes from a sample t-distribution. On the right is the localization precision in the aligned session, on the right in the rotated session. The continuous line is for active localization and the dashed line for passive. In panels B and C the individual data and the bootstrapped confidence interval are shown. Panel B is for the aligned session, and panel C for the rotated session. Each shows active (left) and passive (right) localization precision, for both the control group (red) and the group of participants with EDS (blue). 
 
 ```{r fig.width=8, fig.height=3}
-plotLocalizationVariance()
+plotLocalizationVariance(target='inline')
 ```
 
 In the figure it appears that localization is less precise in the group of people with EDS as compared with the control group.
@@ -196,7 +196,7 @@ It also seems that the difference between active and passive is mostly the same 
 So if the precision of limb localization is lower in the EDS group, then perhaps there is a relationship between EDS indicators and the precision of limb localization. We use Beighton scores as a hypermobility index, measured in both groups, and test if this is correlated with overall localization variance (variance is now calculated across all 4 conditions for every participant - providing more power). First, let's plot this data, with a linear regression:
 
 ```{r fig.width=4, fig.height=4}
-plotBeightonLocSTD()
+plotBeightonLocSTD(target='inline')
 ```
 
 This looks like there is some relationship between the two variables, and this is confirmed by a Pearson correlation:
@@ -236,3 +236,16 @@ So far, these are just checks to see if the experiment worked.
 
 - the EDS group was less precise in hand localization compared to the control group, except perhaps in the aligned/active condition
 - Beighton scores predict overall hand localization precision (across both groups), and while hand localization precision has some predictive power of which group a participant is in, it's differentiation is not great
+
+# Store figures
+
+This chunk of code merely stores all the figures as SVG files in the `doc/` folder of the project:
+
+```{r}
+plotLearningCurves(target='svg')
+plotReachAftereffects(target='svg')
+plotLocalizationShifts(target='svg')
+plotLocalizationVariance(target='svg')
+plotBeightonLocSTD(target='svg')
+```
+
