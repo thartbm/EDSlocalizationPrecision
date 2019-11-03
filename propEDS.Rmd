@@ -221,4 +221,18 @@ We can explore one issue with such a test: it would be best if it were cheap / e
 localizationSTDlogreg()
 ```
 
-Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting. This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull predictor of EDS. 
+Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting. This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull predictor of EDS.
+
+# Summary
+
+Here is a list of findings / results:
+
+- the EDS and control group adapted equally
+- the EDS and control group had equal implicit (without strategy) reach aftereffects
+- there is a difference between EDS and control in the explicit (with strategy) reach aftereffects, which may be due to an uncharacteristic control group (cf. Modchalingam et al., 2019)
+- the EDS and control group shifted their localization responses equally
+
+So far, these are just checks to see if the experiment worked.
+
+- the EDS group was less precise in hand localization compared to the control group, except perhaps in the aligned/active condition
+- Beighton scores predict overall hand localization precision (across both groups), and while hand localization precision has some predictive power of which group a participant is in, it's differentiation is not great
