@@ -292,10 +292,10 @@ plotBeightonLocSTD <- function(target='inline') {
   locSTD$std <- sqrt(locSTD$variance)
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig7.svg', width=4, height=3, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig7.svg', width=4, height=4, system_fonts=list(sans='Arial'))
   }
   
-  plot(-1000,-1000,main='[shorter main title?]',xlab='Beighton score',ylab='localization std',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F)
+  plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization std',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
   
   myLinReg <- lm(std ~ Beighton, data=locSTD)
   Xh <- seq(0,9,.01)
@@ -316,9 +316,10 @@ plotBeightonLocSTD <- function(target='inline') {
     points(subdf$Beighton, subdf$std, col=col, cex=1, pch=1)
     
   }
+  
   labels <- c(as.character(styles$label), 'linear regression')
   colors <- c(as.character(styles$color_solid), '#000000')
-  legend(0, 15, labels, col=colors, bty='n', cex=0.85, lw=1, seg.len = 1)
+  legend(0, 16, labels, col=colors, bty='n', cex=0.85, lw=1, seg.len = 1)
   
   axis(1,seq(0,9,3))
   axis(2,seq(0,15,5))
