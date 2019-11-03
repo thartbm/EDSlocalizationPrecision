@@ -1,5 +1,9 @@
 ---
 title: "Proprioceptive precision in EDS"
+author:
+- Holly Clayton
+- Bernard Marius 't Hart
+- Denise Y.P. Henriques
 output:
   html_document:
     df_print: paged
@@ -7,18 +11,31 @@ output:
   word_document: default
 ---
 
+# Introduction
+
+In this study we want to replicate that people with Ehlers-Danlos Syndrome (EDS) have lower proprioceptive precision than age-matched controls [Clayton et al., XXXX]. We do this with a different method than before, which allows comparing proprioception with predicted sensory consequences. We also have Beighton scores for all participants so that we can see if hypermobility is correlated to proprioceptive precision. The paradigm is exactly the same as in a previous study [Modchalingam et al., 2019] from which we used the non-instructed variant with a rotation of 30 degrees. This could be used as a reference.
+
+The main hypothesis is that in people with EDS, the proprioceptive signals are less reliable, so that precision of proprioceptive hand localization (without any other feedback) will also be less reliable.
+
+The main measurements we use in this study come from a hand localization task. Participant's unseen, right hands are moved to some location. Directly above their right hand is a touch screen, and participants use the index finger of their visible, left hand to indicate where they think their right hand is. The movement with the right hand can be made by a robot, so that participants have an afferent, proprioceptive signal to estimate the location of their right hand. They can also self-generate the movement, so that in addition to afferent information, they also have efferent-based predicted sensory consequences to localize their hand with.
+
+Participants do these two hand localization tasks after training movements with cursor that is aligned with the hand in a first session, and also after training with a cursor that represents the hand position, just rotated 30 degrees around the start position. Training with such rotated feedback is thought to lead to updates in efference-based predicted sensory consequences as well as proprioceptive recalibration. Both of these can be used in hand localization, but we think only the afferent, proprioceptive signal is affected by EDS.
+
+Nevertheless, we will also analyze the data from the reach training session, to see if both people with EDS and controls learn at the same rate and to the same extent. While this is not directly relevant to our hypothesis, we will also test if implicit and explicit motor adaptation (as measured with a PDP procedure applied to reach aftereffects in no-cursor reaching). Here you can see all the data analyses we used, from pre-processing the raw data to published figures and reported statistics. All code and data can be checked and changed or even improved.
+
+# Setting up the R environment
+
+We recommend running the code in the R markdown notebook using R Studio, but it should be possible to run the functions from the R source files in a straightforward installation of R as well.
 
 Packages we want:
 ```{r}
-
 library('ez')
 library('svglite')
-#library('afex')
-
 ```
 
+We've kept the dependencies to a minimum. If either of the two packages is not available on your system, you can install them with this command: `install.packages(c('ez','svglite'))`.
 
-Code we wrote and need:
+There is some code we wrote to do all the pre-processing, create figures and do analyses. Importing the sources below will not do much by itself, as the files only contain functions we defined.
 ```{r}
 source('R/common.R')
 source('R/learningcurves.R')
@@ -28,7 +45,9 @@ source('R/localization_precision.R')
 source('R/data.R')
 ```
 
-For this notebook, we can download pre-processed data files from OSF, but you can choose to download the raw data, and run / check / change pre-processing functions yourself. To do that change the variable 
+If this ran without errors so far, all the functions we need are available.
+
+We still need data. For this notebook, we can simply download pre-processed data files from OSF, but you can choose to download the raw data, and run / check / change pre-processing functions yourself. To do that change the variable `usePreprocessed` to FALSE.
 
 ```{r}
 
@@ -62,12 +81,16 @@ if (usePreprocessed) {
   getLocalizationForANOVA()
   
   # This function is from localization_precision.R and creates the files with participants' localization variance:
-  getLocalizationVariance()  
+  getLocalizationVariance() 
   
 }
 ```
 
+Now that both code and data are available, we can start.
+
 # Adaptation in people with EDS and Controls
+
+First, we look at the adaptation to the 30 degree rotation, to see if the two groups adapt an equally amount and equally fast.
 
 Plot learning curves:
 ```{r fig.width=8, fig.height=3}
@@ -96,7 +119,7 @@ Now, we'll compare the aligned no-cursor deviations with those in the without st
 NoCursorANOVA()
 ```
 
-There is an effect of training, but no effect of group and no interaction between group and training. We interpret this to mean that there is no discernable difference between the groups in their level of adaptation as measured by "without strategy" no-cursor reach deviations.
+There is an effect of training, but no effect of group and no interaction between group and training. We interpret this to mean that there is no discernable difference between the groups in their level of adaptation as measured by the shift from no-cursor reach deviations after aligned cursor training to those in "without strategy" no-cursor reach deviations after rotated training.
 
 Now, let's see if there is any effect of group (EDS or control) on the effect of doing no-cursor reaches with or without strategy:
 
@@ -110,25 +133,33 @@ There is indeed a weak interaction between group and strategy use (F(1,28)=4.52,
 NoCursorTtests()
 ```
 
-Some people in the control group here were apparently able to develop a strategy given only a 30 degree rotation and no instruction (contrary to our earlier findings: Modchalingam et al., 2019). Perhaps a few people in the group of participants with EDS were also able to develop a strategy, but not so many that it caused a difference between the group averages in the _with_ and _without_ strategy conditions.
+Some people in the control group here were apparently able to develop a strategy given only a 30 degree rotation and no instruction (contrary to our earlier findings: Modchalingam et al., 2019). Perhaps a few people in the group of participants with EDS were also able to develop a strategy, but not so many that it caused a difference between this group's averages in the _with_ and _without_ strategy conditions.
 
-**WHAT DOES THIS MEAN?**
+This does not necessarily mean that there is an effect of EDS on explicit learning. Rather it seems that the control group we measured here is somewhat different from the control group we recorded for an earlier study, while the EDS group is not [Modchalingam et al., 2019].
 
 # Localization
 
-First a plot of the shifts in localization responses:
+So now we will look at the measure of interest: hand localization. But before testing the precision of hand localization, we will first test if it shifts and if it shifts differently from the control group. Based on our earlier study with people with EDS, we do not expect this.
+
+First a plot of the shifts in localization responses, induced by rotated training:
 
 ```{r fig.width=8, fig.height=3}
 plotLocalizationShifts(target='inline')
 ```
 
-Looks like there is an effect of training on localization (data in panels A & B seem different from 0). It also looks like there is no difference between the two groups (controls and people with EDS) in both the active and passive localization. It does seem like there is a difference between shifts in active and passive hand localization (data in panel C is somewhat different from 0), but it's unclear if there is a group difference there. Let's run a bunch of ANOVA's:
+To clarify, all figures have the aligned localization responses subtracted.
+
+Looks like there is an effect of training on localization (data in panels A & B seem different from 0). It also looks like there is no difference between the two groups (controls and people with EDS) in both the active and passive localization. It does seem like there is a difference between shifts in active and passive hand localization (data in panel C is somewhat different from 0), but it's unclear if there is a group difference there. Let's run a bunch of ANOVA's.
+
+What are the factors?
+
+angle = hand angle: one of 45, 90 and 135
 
 ```{r}
 localizationAOV()
 ```
 
-This mostly confirms what the figure shows: effects of training on localization, a difference between active and passive localization, but no effects of group. There is one oddity: the effect of passive vs. active localization interacts with the effect of hand angle in the omnibus ANOVA.
+This mostly confirms what the figure shows: effects of training on localization, a difference between active and passive localization, but no effects of group. There is one oddity: the effect of passive vs. active localization interacts with the effect of hand angle in the omnibus ANOVA. This may be explained by the almost flat passive localization curves, while in active localization, the shifts appear larger at 45 and 90 degrees compared to 135. However, even if this is the case here, that should not concern our main question.
 
 # Localization precision
 
@@ -164,7 +195,7 @@ It also seems that the difference between active and passive is mostly the same 
 
 So if the precision of limb localization is lower in the EDS group, then perhaps there is a relationship between EDS indicators and the precision of limb localization. We use Beighton scores as a hypermobility index, measured in both groups, and test if this is correlated with overall localization variance (variance is now calculated across all 4 conditions for every participant - providing more power). First, let's plot this data, with a linear regression:
 
-```{r fig.width=4, fig.height=3}
+```{r fig.width=4, fig.height=4}
 plotBeightonLocSTD()
 ```
 
@@ -176,7 +207,7 @@ correlateBeightonLocSTD()
 
 # Predict EDS from hand localization precision
 
-This raises the question of whether or not EDS can be predicted from hand localization variance. Using the localization variance calculated across all 4 conditions works to some extent:
+This raises the question of whether or not EDS can be predicted from hand localization variance. The figure above shows there are quite a few people with EDS that are in the range of the control group though, so this might not be the case. However, with the localization variance calculated across all 4 conditions it does work to some extent:
 
 ```{r}
 predictGroupBYlocvar()
@@ -190,4 +221,4 @@ We can explore one issue with such a test: it would be best if it were cheap / e
 localizationSTDlogreg()
 ```
 
-Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting. This is still done without training/test datasplits, and still ignores co-predictors, that would reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull predictor of EDS.
+Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting. This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull predictor of EDS. 
