@@ -12,6 +12,12 @@ getAllNoCursors <- function(groups=c('sEDS','zEDS')) {
     groupdf <- getGroupNoCursors(group)
     filename <- sprintf('data/%s_nocursors.csv',group)
     write.csv(filename,x=groupdf,row.names=FALSE,quote=FALSE)
+    
+    groupdf <- getGroupNoCursorVars(group)
+    filename <- sprintf('data/%s_nocursor_var.csv',group)
+    write.csv(filename,x=groupdf,row.names=FALSE,quote=FALSE)
+    
+    
   }
   
 }
@@ -174,9 +180,254 @@ getNoCursors <- function(filename,version='aligned') {
   
 }
 
+getGroupNoCursorVars <- function(group) {
+  
+  participants <- getGroupParticipants(group)
+  
+  # make a dataframe that holds the relevant info
+  GroupNoCursorVars <- data.frame(matrix(data=NA,nrow=length(participants),ncol=4))
+  colnames(GroupNoCursorVars) <- c('participant','aligned','exclusive','inclusive')
+  GroupNoCursorVars$participant <- participants
+  
+  # loop through participants:
+  for (pp in participants) {
+    
+    # get each participants' after effects and store in dataframe:
+    GroupNoCursorVars[which(GroupNoCursorVars$participant == pp), c('aligned','exclusive','inclusive')] <- getParticipantNoCursorVars(pp)
+    
+  }
+  
+  # return the after effects dataframe:
+  return(GroupNoCursorVars)
+  
+}
+
+getParticipantNoCursorVars <- function(participant) {
+  
+  pdf <- read.csv('data/participants_files.csv',stringsAsFactors=FALSE)
+  
+  folder <- pdf[pdf$ID==participant, 'folder']
+  version <- pdf[pdf$ID==participant, 'version']
+  
+  alignednocursor <- pdf[pdf$ID==participant,'aligned_nocursor']
+  alignednocursor <- sprintf('data/%s/%s/%s',folder,participant,alignednocursor)
+  alignedNoCursor <- getNoCursors(alignednocursor, version='aligned')
+  
+  # aligned reaches need to be boiled down to simple biases, one for each target angle
+  # for now we will use the final one third of each set
+  alignedBiases <- getAlignedBiases(alignedNoCursor)
+  # the getAlignedBiases function should work, if the dataframe has the same column names...
+  # otherwise, it might actually be a one-liner, with aggregate()
+  
+  # we subtract the bias for each target angle before calculating the overall variance:
+  for (target_angle in alignedBiases$target_angle) {
+    TA_idx <- which(alignedNoCursor$target_angle == target_angle)
+    bias <- as.numeric(mean(alignedBiases$angular_deviation[which(alignedBiases$target_angle == target_angle)]))
+    alignedNoCursor$angular_deviation[TA_idx] <- alignedNoCursor$angular_deviation[TA_idx] - bias
+  }
+  
+  rotatednocursor <- pdf[pdf$ID==participant,'rotated_nocursor']
+  rotatednocursor <- sprintf('data/%s/%s/%s',folder,participant,rotatednocursor)
+  rotatedNoCursor <- getNoCursors(rotatednocursor,version=version)
+  
+  # we remove the mean from rotated deviations before calculating the variance:
+  # but split by set (include / exclude strategy) and accounting for target angle
+  # this should take care of most idiosyncratic biases
+  for (set in unique(rotatedNoCursor$set)) {
+    for (target_angle in unique(rotatedNoCursor$target_angle)) {
+      
+      TA_idx <- which(rotatedNoCursor$set == set & rotatedNoCursor$target_angle == target_angle)
+      rotatedNoCursor$angular_deviation[TA_idx] <- rotatedNoCursor$angular_deviation[TA_idx] - mean(rotatedNoCursor$angular_deviation[TA_idx], na.rm=TRUE)
+      
+    }
+  }
+  
+  # get three numbers: aligned / exclusive / inclusive
+  reachAngles <- aggregate(as.formula('angular_deviation ~ set'), rotatedNoCursor, sd, na.rm=TRUE)
+  reachAngles <- c(sd(alignedBiases$angular_deviation), c(reachAngles$angular_deviation))
+  
+  return(reachAngles)
+  
+}
+
+
+
 # Figures -----
 
 plotReachAftereffects <- function(target='inline') {
+  
+  if (target == 'svg') {
+    svglite::svglite(file='doc/Fig4.svg', width=8, height=3, system_fonts=list(sans='Arial'))
+  }
+  
+  styles <- getStyle()
+  
+  #par(mfrow=c(1,1), mar=c(4,4,2,0.1))
+  
+  par(mar=c(4,4,2,0.1))
+  
+  
+  layout(matrix(c(1,2,2,3,3,4), nrow=2, ncol=3, byrow = TRUE), widths=c(1,1,1), heights=c(1,1))
+  
+  
+  ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
+  plot(c(0.8,2.2),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.75,2.25),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]',main='',font.main=1)
+  
+  #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  mtext('A', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    
+    reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
+    
+    reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
+    reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
+    
+    meanExc <- mean(reachaftereffects$exclusive)
+    meanInc <- mean(reachaftereffects$inclusive)
+    
+    coord.x <- c(1,1,2,2)
+    coord.y <- c(t.interval(reachaftereffects$exclusive),rev(t.interval(reachaftereffects$inclusive)))
+    polygon(coord.x, coord.y, col=as.character(styles$color_trans[groupno]), border=NA)
+    
+  }
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    offset <- (groupno - ((length(styles$group) - 1) / 2)) * .035
+    
+    reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
+    
+    
+    reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
+    reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
+    
+    meanExc <- mean(reachaftereffects$exclusive)
+    meanInc <- mean(reachaftereffects$inclusive)
+    
+    lines(c(1,2),c(meanExc,meanInc),col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
+    
+  }
+  
+  axis(side=1, at=c(1,2), labels=c('without strategy','with strategy'),cex.axis=1.00)
+  if (max(styles$rotation) == 30) {
+    axis(side=2, at=c(0,10,20,30),cex.axis=1.00)
+  }
+  
+  # legend(0.5,max(styles$rotation)*(7/6),styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.85)
+  legend(0.8,30,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
+  
+  
+  plot(c(0.4,3.6),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,3.5),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]',main='',font.main=1)
+  
+  
+  #mtext('B', side=3, outer=TRUE, at=c(2/5,1), line=-1, adj=0, padj=1)
+  mtext('B', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    #print(group)
+    reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
+    #print(str(reachaftereffects))
+    conditions <- c('aligned','exclusive','inclusive')
+    for (conditionno in c(1:length(conditions))) {
+      
+      #print(conditionno)
+      
+      condition <- conditions[conditionno]
+      
+      nocursors <- as.numeric(reachaftereffects[,condition])
+      #print(str(nocursors))
+      X <- rep((conditionno+((groupno-1.7)/2.5)),length(nocursors))
+      Y <- as.numeric(nocursors)
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      
+      meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) / 6
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      Xoffset <- (conditionno+((groupno-1.4)/2.5))
+      
+      polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      
+    }
+    
+  }
+  
+  axis(side=1, at=c(1,2,3),labels=conditions)
+  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  
+  
+  plot(c(0.4,3.6),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,3.5),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach precision, SD [°]',main='',font.main=1)
+  
+  #mtext('C', side=2, outer=TRUE, at=c(0,0.5), line=-1, adj=1, padj=0, las=1)
+  mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    #print(group)
+    reachaftereffects <- read.csv(sprintf('data/%s_nocursor_var.csv',group), stringsAsFactors=FALSE)
+    #print(str(reachaftereffects))
+    conditions <- c('aligned','exclusive','inclusive')
+    for (conditionno in c(1:length(conditions))) {
+      
+      #print(conditionno)
+      
+      condition <- conditions[conditionno]
+      
+      nocursors <- as.numeric(reachaftereffects[,condition])
+      #print(str(nocursors))
+      X <- rep((conditionno+((groupno-1.7)/2.5)),length(nocursors))
+      Y <- as.numeric(nocursors)
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      
+      meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) / 6
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      Xoffset <- (conditionno+((groupno-1.4)/2.5))
+      
+      polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      
+    }
+    
+  }
+  
+  axis(side=1, at=c(1,2,3),labels=conditions)
+  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  
+  
+  if (target == 'svg') {
+    dev.off()
+  }
+  
+}
+
+OLDplotReachAftereffects <- function(target='inline') {
   
   if (target == 'svg') {
     svglite::svglite(file='doc/Fig4.svg', width=8, height=3, system_fonts=list(sans='Arial'))
