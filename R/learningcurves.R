@@ -292,7 +292,8 @@ plotLearningCurves <- function(target='inline') {
   ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
   plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  mtext('A', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   for (groupno in c(1:length(styles$group))) {
     
@@ -317,7 +318,8 @@ plotLearningCurves <- function(target='inline') {
   
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('B', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
+  #mtext('B', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
+  mtext('B', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   blockdefs <- list(c(1,3),c(4,3),c(76,15))
   
@@ -366,7 +368,8 @@ plotLearningCurves <- function(target='inline') {
   
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('C', side=3, outer=TRUE, at=c(5/7,1), line=-1, adj=0, padj=1)
+  #mtext('C', side=3, outer=TRUE, at=c(5/7,1), line=-1, adj=0, padj=1)
+  mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   blockdefs <- list(c(1,3),c(4,3))
   
