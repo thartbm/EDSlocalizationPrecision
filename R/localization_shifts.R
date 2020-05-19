@@ -434,7 +434,7 @@ plotLocalizationShifts <- function(target='inline') {
     svglite(file='doc/Fig5.svg', width=7.5, height=3, system_fonts=list(sans='Arial'))
   }
   
-  par(mfrow=c(1,3), mar=c(4,4,2,0.1))
+  par(mfrow=c(2,3), mar=c(4,4,2,0.1))
   
   # # # # # # # # # #
   # panels A & B: active and passive localization
@@ -446,7 +446,8 @@ plotLocalizationShifts <- function(target='inline') {
     # create plot panel with the right properties
     plot(c(25,175),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='localization shift [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
     
-    mtext(c('A','B')[reachtype.idx], side=3, outer=TRUE, at=c(c(0,1/3)[reachtype.idx],1), line=-1, adj=0, padj=1)
+    #mtext(c('A','B')[reachtype.idx], side=3, outer=TRUE, at=c(c(0,1/3)[reachtype.idx],1), line=-1, adj=0, padj=1)
+    mtext(c('A','B')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
     
     axis(1, at=c(45,90,135),cex.axis=0.85)
     axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
@@ -510,7 +511,8 @@ plotLocalizationShifts <- function(target='inline') {
   
   plot(c(25,175),c(0,0),type='l',main='predicted consequences',xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='update [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
   
-  mtext('C', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
+  #mtext('C', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
+  mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   axis(1, at=c(45,90,135),cex.axis=0.85)
   axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
@@ -578,6 +580,184 @@ plotLocalizationShifts <- function(target='inline') {
   
   
   legend(60,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
+  
+  
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  #
+  #             NOW THE LOCALIZATION PRECISION
+  #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  
+  # get the data:
+  
+  SlocVar <- read.csv('data/sEDS_localization_var.csv', stringsAsFactors = FALSE)
+  SlocVar$group <- 'sEDS'
+  ZlocVar <- read.csv('data/zEDS_localization_var.csv', stringsAsFactors = FALSE)
+  ZlocVar$group <- 'zEDS'
+  
+  locVar <- rbind(SlocVar, ZlocVar)
+  locVar$std <- sqrt(locVar$var)
+  
+  # get the y-axis equal for all panels:
+  
+  ylims <- c(0,16)
+  
+  # # # # # # # # # #
+  # panel D: localization variance as in ANOVA
+  
+  plot(c(0.5,2.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,2.5),ylim=ylims,main='localization precision',xlab='condition',ylab='localization precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  
+  #mtext('D', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  mtext('D', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  avgLocCI <- aggregate(std ~ group + passive + rotated, data=locVar, FUN=t.interval)
+  
+  for (group in styles$group) {
+    
+    col <- as.character(styles$color_trans[which(styles$group == group)])
+    
+    for (passive in c(0,1)) {
+      
+      loLV <- avgLocCI$std[which(avgLocCI$group == group & avgLocCI$passive == passive),1]
+      hiLV <- avgLocCI$std[which(avgLocCI$group == group & avgLocCI$passive == passive),2]
+      
+      Y <- c(loLV, rev(hiLV))
+      X <- c(1,2,2,1)
+      
+      polygon(X,Y,col=col,border=NA)
+      
+    }
+    
+  }
+  
+  avgLocStd <- aggregate(std ~ group + passive + rotated, data=locVar, FUN=mean, na.rm=TRUE)
+  
+  for (group in styles$group) {
+    
+    col <- as.character(styles$color_solid[which(styles$group == group)])
+    
+    for (passive in c(0,1)) {
+      
+      linestyle <- passive + 1
+      
+      LV <- avgLocStd$std[which(avgLocStd$group == group & avgLocStd$passive == passive)]
+      
+      lines(x=c(1,2),y=LV,lty=linestyle,col=col)
+      
+    }
+    
+  }
+  
+  axis(side=1,at=c(1,2),labels=c('aligned','rotated'))
+  axis(side=2,at=seq(0,16,4))
+  
+  
+  # # # # # # # # # #
+  # panel E: aligned localization variance descriptives
+  
+  
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='aligned localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  
+  #mtext('E', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
+  mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  ####
+  
+  for (passive in c(0,1)) {
+    
+    for (groupno in c(1,2)) {
+      
+      group <- styles$group[groupno]
+      
+      #cols <- styles$color_solid[groupno]
+      #colt <- styles$color_trans[groupno]
+      
+      locvars <- locVar$std[which(locVar$group == group & locVar$rotated == 0 & locVar$passive == passive)]
+      
+      #print(str(nocursors))
+      X <- rep( (passive*2)+(groupno)-.33, length(locvars) )
+      #X <- rep(((passive*2)+((groupno-1.7)/2.5))+2,length(locvars))
+      
+      Y <- locvars
+      
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      
+      meandist <- getConfidenceInterval(data=locvars, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) / 3
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      Xoffset <- (passive*2)+(groupno)
+      
+      polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      
+      points(x=Xoffset,y=mean(locvars),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      
+    }
+    
+  }
+  
+  ####
+  
+  axis(side=1, at=c(1.5,3.5), labels=c('active','passive'))
+  
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  #
+  # panel F: rotated localization variance descriptives
+  #
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='rotated localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  
+  #mtext('F', side=3, outer=TRUE, at=c(2/3,0.5), line=-1, adj=0, padj=1)
+  mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  for (passive in c(0,1)) {
+    
+    for (groupno in c(1,2)) {
+      
+      group <- styles$group[groupno]
+      
+      #cols <- styles$color_solid[groupno]
+      #colt <- styles$color_trans[groupno]
+      
+      locvars <- locVar$std[which(locVar$group == group & locVar$rotated == 1 & locVar$passive == passive)]
+      
+      #print(str(nocursors))
+      X <- rep( (passive*2)+(groupno)-.33, length(locvars) )
+      #X <- rep(((passive*2)+((groupno-1.7)/2.5))+2,length(locvars))
+      
+      Y <- locvars
+      
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      
+      meandist <- getConfidenceInterval(data=locvars, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) / 3
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      Xoffset <- (passive*2)+(groupno)
+      
+      polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      
+      points(x=Xoffset,y=mean(locvars),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      
+    }
+    
+  }
+  
+  axis(side=1, at=c(1.5,3.5), labels=c('active','passive'))
+  
+  
   
 }
 
