@@ -399,7 +399,7 @@ plotLearningCurves <- function(target='inline') {
   par(mar=c(4,4,2,0.1))
   
   
-  layout(matrix(c(1,2,3,4,5,6), nrow=2, ncol=3, byrow = TRUE), widths=c(3,2,2), heights=c(1,1))
+  layout(matrix(c(1,2,3,4), nrow=2, ncol=2, byrow = TRUE), widths=c(1,1), heights=c(1,1))
   
   # # # # # # # # # #
   # panel A: actual learning curves
@@ -431,7 +431,7 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel B: blocked learning curves
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
   #mtext('B', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
   mtext('B', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -481,12 +481,12 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel C: individual participants in the first trial set
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,6.5),ylim=ylims,xlab='trial set',ylab='individual reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
   #mtext('C', side=3, outer=TRUE, at=c(5/7,1), line=-1, adj=0, padj=1)
   mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
-  blockdefs <- list(c(1,3),c(4,3))
+  blockdefs <- list(c(1,3),c(4,3),c(76,15))
   
   for (groupno in c(1:length(styles$group))) {
     
@@ -494,7 +494,7 @@ plotLearningCurves <- function(target='inline') {
     
     blocked <- getBlockedLearningCurves(group, blockdefs)
     
-    for (blockno in c(1,2)) {
+    for (blockno in c(1,2,3)) {
       
       X <- rep((groupno-(1/3)+((blockno-1)*2)),dim(blocked)[1])
       Y <- c(blocked[,blockno])
@@ -519,8 +519,54 @@ plotLearningCurves <- function(target='inline') {
   }
   
   
-  axis(side=1, at=c(1,2,3,4),labels=c('control\ntrial 1-3','EDS\ntrial 1-3','control\ntrial 4-6','EDS\ntrial 4-6'),cex.axis=0.85)
+  axis(side=1, at=c(1.5,3.5,5.5),labels=c('1-3','4-6','76-90'),cex.axis=1.00)
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  
+  # # # # # # # # # #
+  # panel D: aligned and rotated reach precision
+  
+  ylims=c(-.1*max(styles$rotation),(max(styles$rotation)*(2/3))+(.2*(max(styles$rotation))))
+  
+  plot(c(0.5,4.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0,5),ylim=ylims,xlab='session',ylab='reach precision, SD [°]',xaxt='n',yaxt='n',bty='n',main='reach precision',font.main=1)
+  
+  #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  mtext('D', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group  <- styles$group[groupno]
+    reachprecision <- read.csv(sprintf('data/%s_training_var.csv',group), stringsAsFactors=FALSE)  
+    
+    conditions <- c('aligned','rotated')
+    
+    for (conditionno in c(1:length(conditions))) {
+      
+      condition <- conditions[conditionno]
+      
+      X <- rep((groupno-(1/3)+((conditionno-1)*2)),dim(reachprecision)[1])
+      Y <- c(reachprecision[,condition])
+      
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      
+      meandist <- getConfidenceInterval(data=Y, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) / 2.5
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      polygon(x=DY+groupno+((conditionno-1)*2), y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(groupno+((conditionno-1)*2),2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      points(x=groupno+((conditionno-1)*2),y=mean(Y),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      
+    }
+    
+  }
+  
+  axis(side=1, at=c(1.5,3.5), labels=c('aligned','rotated'),cex.axis=1.00)
+  axis(side=2, at=c(0,10,20),cex.axis=1.00)
   
   
   if (target == 'svg') {
@@ -611,5 +657,49 @@ blockLearningANOVA <- function(block=1) {
   # for ez, case ID should be a factor:
   LC4aov$participant <- as.factor(LC4aov$participant)
   print(ez::ezANOVA(data=LC4aov, wid=participant, dv=reachdeviation, between=c(group),type=3))
+  
+}
+
+getReachPrecision4aov <- function() {
+  
+  styles <- getStyle()
+  
+  group          <- c()
+  participant    <- c()
+  training       <- c()
+  reachprecision <- c()
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    groupname  <- styles$group[groupno]
+    RP <- read.csv(sprintf('data/%s_training_var.csv',groupname), stringsAsFactors=FALSE)  
+    
+    N <- dim(RP)[1]
+    
+    for (session in c('aligned','rotated')) {
+      
+      group          <- c(group,          rep(groupname,N))
+      participant    <- c(participant,    RP$participant)
+      training       <- c(training,       rep(session,N))
+      reachprecision <- c(reachprecision, RP[,session])
+      
+    }
+    
+  }
+  
+  RP4A <- data.frame(group,participant,training,reachprecision)
+  RP4A$group       <- as.factor(RP4A$group)
+  RP4A$participant <- as.factor(RP4A$participant)
+  RP4A$training    <- as.factor(RP4A$training)
+  
+  return(RP4A)
+  
+}
+
+reachPrecisionANOVA <- function() {
+  
+  RP4aov <- getReachPrecision4aov()
+  
+  print(ez::ezANOVA(data=RP4aov, wid=participant, dv=reachprecision, between=c(group), within=c(training), type=3))
   
 }
