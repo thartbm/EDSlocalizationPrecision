@@ -1,6 +1,74 @@
 
 # Data Handling -----
 
+getLocalizationTrends <- function(groups=c('sEDS','zEDS')) {
+  
+  for (group in groups) {
+    
+    # set up vectors that will become data frame columns:
+    participant <- c()
+    rotated <- c()
+    passive <- c()
+    handlocation_deg <- c()
+    localizationbias_deg <- c()
+    
+    # hand locations where we estimate bias:
+    X <- seq(35,145)
+    
+    # read in the screened and compiled data:
+    loc <- read.csv(sprintf('data/%s_localization.csv',group), stringsAsFactors = FALSE)
+    loc$tap_error <- loc$tap_angle - loc$hand_angle
+    loc$predicted_error <- NA
+    
+    # loop through participants:
+    participants <- unique(loc$participant)
+    
+    for (pp in participants) {
+      
+      # look at rotated/aligned and passive/active seprately:
+      for (rot in c(0,1)) {
+        
+        for (pas in c(0,1)) {
+          
+          # index for all relevant rows:
+          idx <- which(loc$participant == pp & loc$rotated == rot & loc$passive == pas)
+          
+          # get relevant data:
+          subdf <- loc[idx,]
+          hand_angle <- subdf$hand_angle
+          tap_error  <- subdf$tap_error
+
+          # spline interpolate through the data:
+          spl <- smooth.spline(x=hand_angle, y=tap_error, spar=0.90, keep.data=F )
+          splTrend <- predict(spl, x=X)$y
+          
+          # make sure we don't extrapolate:
+          nanidx <- c(which(X < min(hand_angle)), which(X > max(hand_angle)))
+          splTrend[nanidx] <- NA
+          
+          # add data to vectors:
+          participant <- c(participant, rep(pp, length(X)))
+          rotated <- c(rotated, rep(rot, length(X)))
+          passive <- c(passive, rep(pas, length(X)))
+          handlocation_deg <- c(handlocation_deg, X)
+          localizationbias_deg <- c(localizationbias_deg, splTrend)
+          
+        }
+        
+      }
+      
+    }
+    
+    # end of group loop
+    groupLocBias <- data.frame(participant, rotated, passive, handlocation_deg, localizationbias_deg)
+    
+    write.csv(groupLocBias, file=sprintf('data/%s_localizationbias.csv',group), row.names=FALSE, quote=FALSE)
+
+  }
+  
+  # return nothing: data is stored in files (or downloaded from OSF)
+  
+}
 
 detrendLocalization <- function(groups=c('sEDS','zEDS')) {
   
@@ -292,10 +360,10 @@ plotBeightonLocSTD <- function(target='inline') {
   locSTD$std <- sqrt(locSTD$variance)
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig7.svg', width=4, height=4, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig6.svg', width=4, height=4, system_fonts=list(sans='Arial'))
   }
   
-  plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization std',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
+  plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization SD [°]',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
   
   myLinReg <- lm(std ~ Beighton, data=locSTD)
   Xh <- seq(0,9,.01)
