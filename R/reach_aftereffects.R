@@ -267,12 +267,12 @@ plotReachAftereffects <- function(target='inline') {
   par(mar=c(4,4,2,0.1))
   
   
-  layout(matrix(c(1,2,2,3,3,4), nrow=2, ncol=3, byrow = TRUE), widths=c(1,1,1), heights=c(1,1))
+  layout(matrix(c(1,2,3,4), nrow=2, ncol=2, byrow = TRUE), widths=c(1,1), heights=c(1,1))
   
   
   ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
   plot(c(0.8,2.2),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.75,2.25),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]',main='',font.main=1)
+       xaxt='n',yaxt='n',xlab='session',ylab='reach deviation [°]',main='no-cursor reaching',font.main=1)
   
   #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
   mtext('A', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -283,14 +283,16 @@ plotReachAftereffects <- function(target='inline') {
     
     reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
     
-    reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
-    reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
+    #reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
+    #reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
     
     meanExc <- mean(reachaftereffects$exclusive)
-    meanInc <- mean(reachaftereffects$inclusive)
+    meanAli <- mean(reachaftereffects$aligned)
+    #meanInc <- mean(reachaftereffects$inclusive)
     
     coord.x <- c(1,1,2,2)
-    coord.y <- c(t.interval(reachaftereffects$exclusive),rev(t.interval(reachaftereffects$inclusive)))
+    #coord.y <- c(t.interval(reachaftereffects$exclusive),rev(t.interval(reachaftereffects$inclusive)))
+    coord.y <- c(t.interval(reachaftereffects$aligned),rev(t.interval(reachaftereffects$exclusive)))
     polygon(coord.x, coord.y, col=as.character(styles$color_trans[groupno]), border=NA)
     
   }
@@ -303,17 +305,18 @@ plotReachAftereffects <- function(target='inline') {
     reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
     
     
-    reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
-    reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
+    #reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
+    #reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
     
+    meanAli <- mean(reachaftereffects$aligned)
     meanExc <- mean(reachaftereffects$exclusive)
-    meanInc <- mean(reachaftereffects$inclusive)
+    #meanInc <- mean(reachaftereffects$inclusive)
     
-    lines(c(1,2),c(meanExc,meanInc),col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
+    lines(c(1,2),c(meanAli,meanExc),col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
     
   }
   
-  axis(side=1, at=c(1,2), labels=c('without strategy','with strategy'),cex.axis=1.00)
+  axis(side=1, at=c(1,2), labels=c('aligned','rotated'),cex.axis=1.00)
   if (max(styles$rotation) == 30) {
     axis(side=2, at=c(0,10,20,30),cex.axis=1.00)
   }
@@ -322,8 +325,8 @@ plotReachAftereffects <- function(target='inline') {
   legend(0.8,30,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
   
   
-  plot(c(0.4,3.6),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,3.5),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]',main='',font.main=1)
+  plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='group',ylab='individual reach aftereffects [°]',main='reach aftereffects',font.main=1)
   
   
   #mtext('B', side=3, outer=TRUE, at=c(2/5,1), line=-1, adj=0, padj=1)
@@ -335,45 +338,68 @@ plotReachAftereffects <- function(target='inline') {
     #print(group)
     reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
     #print(str(reachaftereffects))
-    conditions <- c('aligned','exclusive','inclusive')
-    for (conditionno in c(1:length(conditions))) {
-      
-      #print(conditionno)
-      
-      condition <- conditions[conditionno]
-      
-      nocursors <- as.numeric(reachaftereffects[,condition])
-      #print(str(nocursors))
-      X <- rep((conditionno+((groupno-1.7)/2.5)),length(nocursors))
-      Y <- as.numeric(nocursors)
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
-      
-      meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
-      
-      DX <- meandist$density$x
-      DY <- meandist$density$y / max(meandist$density$y) / 6
-      
-      DX <- c(DX[1], DX, DX[length(DX)])
-      DY <- c(0,     DY, 0)
-      
-      Xoffset <- (conditionno+((groupno-1.4)/2.5))
-      
-      polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
-      
-      lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
-      #print(meandist$CI95)
-      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
-      
-    }
+    # conditions <- c('aligned','exclusive')
+    # for (conditionno in c(1:length(conditions))) {
+    #   
+    #   #print(conditionno)
+    #   
+    #   condition <- conditions[conditionno]
+    #   
+    #   nocursors <- as.numeric(reachaftereffects[,condition])
+    #   #print(str(nocursors))
+    #   X <- rep((conditionno+((groupno-1.7)/2.5)),length(nocursors))
+    #   Y <- as.numeric(nocursors)
+    #   points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+    #   
+    #   meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+    #   
+    #   DX <- meandist$density$x
+    #   DY <- meandist$density$y / max(meandist$density$y) / 6
+    #   
+    #   DX <- c(DX[1], DX, DX[length(DX)])
+    #   DY <- c(0,     DY, 0)
+    #   
+    #   Xoffset <- (conditionno+((groupno-1.4)/2.5))
+    #   
+    #   polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+    #   
+    #   lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+    #   #print(meandist$CI95)
+    #   points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+    #   
+    # }
+    
+    RAE <- as.numeric(reachaftereffects$exclusive - reachaftereffects$aligned)
+    
+    X <- rep(groupno-.2,length(RAE))
+    Y <- as.numeric(RAE)
+    points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+    
+    meandist <- getConfidenceInterval(data=c(RAE), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+    
+    DX <- meandist$density$x
+    DY <- meandist$density$y / max(meandist$density$y) / 5
+    
+    DX <- c(DX[1], DX, DX[length(DX)])
+    DY <- c(0,     DY, 0)
+    
+    Xoffset <- (groupno+.1)
+    
+    polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+    
+    lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+    #print(meandist$CI95)
+    points(x=Xoffset,y=mean(c(RAE)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+    
     
   }
   
-  axis(side=1, at=c(1,2,3),labels=conditions)
+  axis(side=1, at=c(1,2),labels=styles$label)
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
   
   
-  plot(c(0.4,3.6),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,3.5),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach precision, SD [°]',main='',font.main=1)
+  plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='group',ylab='individual reach precision, SD [°]', main='aligned',font.main=1)
   
   #mtext('C', side=2, outer=TRUE, at=c(0,0.5), line=-1, adj=1, padj=0, las=1)
   mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -385,6 +411,7 @@ plotReachAftereffects <- function(target='inline') {
     reachaftereffects <- read.csv(sprintf('data/%s_nocursor_var.csv',group), stringsAsFactors=FALSE)
     #print(str(reachaftereffects))
     conditions <- c('aligned','exclusive','inclusive')
+    conditions <- c('aligned')
     for (conditionno in c(1:length(conditions))) {
       
       #print(conditionno)
@@ -393,19 +420,19 @@ plotReachAftereffects <- function(target='inline') {
       
       nocursors <- as.numeric(reachaftereffects[,condition])
       #print(str(nocursors))
-      X <- rep((conditionno+((groupno-1.7)/2.5)),length(nocursors))
+      X <- rep(groupno-.2,length(nocursors))
       Y <- as.numeric(nocursors)
       points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
       DX <- meandist$density$x
-      DY <- meandist$density$y / max(meandist$density$y) / 6
+      DY <- meandist$density$y / max(meandist$density$y) / 5
       
       DX <- c(DX[1], DX, DX[length(DX)])
       DY <- c(0,     DY, 0)
       
-      Xoffset <- (conditionno+((groupno-1.4)/2.5))
+      Xoffset <- (groupno+0.1)
       
       polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
       
@@ -417,8 +444,60 @@ plotReachAftereffects <- function(target='inline') {
     
   }
   
-  axis(side=1, at=c(1,2,3),labels=conditions)
+  axis(side=1, at=c(1,2),labels=styles$label)
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  
+  
+  plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='group',ylab='individual reach precision, SD [°]', main='rotated',font.main=1)
+  
+  #mtext('C', side=2, outer=TRUE, at=c(0,0.5), line=-1, adj=1, padj=0, las=1)
+  mtext('D', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    #print(group)
+    reachaftereffects <- read.csv(sprintf('data/%s_nocursor_var.csv',group), stringsAsFactors=FALSE)
+    #print(str(reachaftereffects))
+    conditions <- c('aligned','exclusive','inclusive')
+    conditions <- c('exclusive')
+    for (conditionno in c(1:length(conditions))) {
+      
+      #print(conditionno)
+      
+      condition <- conditions[conditionno]
+      
+      nocursors <- as.numeric(reachaftereffects[,condition])
+      #print(str(nocursors))
+      X <- rep(groupno-.2,length(nocursors))
+      Y <- as.numeric(nocursors)
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      
+      meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) / 5
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      Xoffset <- (groupno+.1)
+      
+      polygon(x=DY+Xoffset, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      
+    }
+    
+  }
+  
+  axis(side=1, at=c(1,2),labels=styles$label)
+  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  
+  
   
   
   if (target == 'svg') {
@@ -619,18 +698,18 @@ RAE.ANOVA <- function() {
   
 }
 
-NoCursorANOVA <- function() {
+NoCursorANOVA <- function(datatype='deviation') {
   
   styles <- getStyle()
   
-  NC4aov <- getNoCursors4ANOVA(styles)
+  NC4aov <- getNoCursors4ANOVA(styles,datatype=datatype)
   
   NC4aov$participant <- as.factor(NC4aov$participant)
-  print(ezANOVA(data=NC4aov, wid=participant, dv=reachdeviation, within=training, between=c(group),type=3))
+  print(ez::ezANOVA(data=NC4aov, wid=participant, dv=reachdeviation, within=training, between=c(group),type=3))
   
 }
 
-getNoCursors4ANOVA <- function(styles) {
+getNoCursors4ANOVA <- function(styles, datatype='deviation') {
   
   # placeholder for data frame:
   NC4aov <- NA
@@ -640,8 +719,12 @@ getNoCursors4ANOVA <- function(styles) {
     
     groupname <- styles$group[groupno]
     
-    
-    df <- read.csv(sprintf('data/%s_nocursors.csv',groupname),stringsAsFactors=F)
+    if (datatype == 'deviation') {
+      df <- read.csv(sprintf('data/%s_nocursors.csv',groupname),stringsAsFactors=F)
+    }
+    if (datatype == 'precision') {
+      df <- read.csv(sprintf('data/%s_nocursor_var.csv',groupname),stringsAsFactors=F)
+    }
     
     AL.NC <- df[,c('participant','aligned')]
     colnames(AL.NC)[2] <- 'reachdeviation'
@@ -702,5 +785,20 @@ NoCursorTtests <- function() {
 
   cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(EDSwos, EDSwis)))
   
+  
+}
+
+RAEprecisionTtest <- function() {
+ 
+  styles <- getStyle()
+  
+  NC4aov <- getNoCursors4ANOVA(styles,datatype='precision')
+  
+  NC4aov$participant <- as.factor(NC4aov$participant)
+  
+  EDS <- NC4aov$reachdeviation[which(NC4aov$group == 'zEDS' & NC4aov$training == 'aligned')]
+  CTR <- NC4aov$reachdeviation[which(NC4aov$group == 'sEDS' & NC4aov$training == 'aligned')]
+  
+  print(t.test(EDS, CTR))
   
 }
