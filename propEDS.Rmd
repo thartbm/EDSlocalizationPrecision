@@ -74,19 +74,28 @@ usePreprocessed <- TRUE
 
 if (usePreprocessed) {
   
+  # we make sure the files are downloaded from OSF and unzipped:
   getPreprocessedData()
   
 } else {
   
+  # we still need to download the raw data from OSF:
   getPreprocessedData(participantsOnly=TRUE)
+  
+  # and then we run a bunch of function to get out the interesting bits:
   
   # This function is from data.R and downloads and unzips a zip file with the raw data:
   getRawData()
   
-  # This function is from learningcurves.R and creates the pre-processed learning-curve files:
+  # These functions are from learningcurves.R and 
+  # 1) create the pre-processed learning-curve files:
   getLearningCurves()
+  # 2) create files with reach precision during training:
+  getReachPrecision()
   
-  # This function is from reach_aftereffects.R creates the nocursors / reachaftereffect files:
+  # This function is from reach_aftereffects.R creates
+  # 1) the nocursors / reachaftereffect files, and
+  # 2) the no-cursor precision files:
   getAllNoCursors()
   
   
@@ -98,8 +107,11 @@ if (usePreprocessed) {
   # This one creates the loc_AOV files to do statistics on:
   getLocalizationForANOVA()
   
-  # This function is from localization_precision.R and creates the files with participants' localization variance:
+  # These functions are from localization_precision.R and
+  # 1) create the files with participants' localization variance:
   getLocalizationVariance()
+  # 2) create the files with participants' localization biases:
+  getLocalizationTrends()
   
 }
 ```
@@ -109,10 +121,12 @@ Now that both code and data are available, we can start.
 _Planned Figures_
 
 For the Methods:
+
 1. Setup & Trial types
 2. Task order
 
 For the Results:
+
 3. Baseline proprioceptive accuracy & precision
 4. Aligned reaching
 5. Learning curves
@@ -120,10 +134,27 @@ For the Results:
 7. Recalibrated proprioceptive accuracy & precision
 8. Beighton scores over proprioceptive precision
 
-# Baseline proprioceptive accuracy and precision
+_Current Figures_
 
+For the Methods:
 
+1. Setup & Trial types
+2. Task order
 
+For the Results:
+
+3. Reach training, with aligned and rotated reach precision
+4. Implicit no-cursor changes, with aligned and rotated open-loop reach precision
+5. Localization: baseline biases, shifts, precision
+6. Beighton scores over proprioceptive precision
+
+- 3 & 4 show no difference between EDS and controls
+- 5 does show an effect on precision (which can't be explained by closed/open-loop baseline, changes or precision: see 3+4)
+- 6 and this correlates with severity of symptoms
+
+# Proprioceptive accuracy and precision
+
+> _Our main question is on the proprioceptive accuracy and precision in people with EDS compared to controls. However, before we able to investigate this with our data, we need to rule out a few alternative explanations. First, do people with EDS reach differently to begin with, or adapt in a different way compared to controls. Second, is the implicit motor adaptation in people with EDS different from controls?_
 
 # Adaptation in people with EDS and Controls
 
@@ -141,7 +172,19 @@ Learning curves ANOVA:
 learningCurveANOVA()
 ```
 
-This ANOVA finds no difference between the two groups, nor an interaction between group and block. There is an effect of block. We interpret this to mean that both groups learned, and that there is no discernable difference in their rate or asymptotic level of learning.
+This ANOVA finds no difference between the two groups, nor an interaction between group and block. There is an effect of block. We interpret this to mean that both groups learned, and that there is no discernable difference in either their rate of learning or in their asymptotic level of learning.
+
+## Closed-loop reach precision
+
+We also see the reach precision (the standard deviation of target-normalized reach errors, for the last 15 trials of the first long block in both the aligned and rotated session). There might be a small effect of group as the control group seems to have higher precision in the aligned session, but their precision decreases more than that of the EDS group. We this this with an mixed-design ANOVA on reach precision using group (control or EDS) as a between-subjects factor and training (aligned or rotated) as a within-subjects factor.
+
+```{r}
+reachPrecisionANOVA()
+```
+
+There is an effect of training session (aligned or rotated), so that we can say that training with manipulated feedback decreases precision. However, there is no effect of group (EDS or control), nor an interaction between group and training session. We take this to mean that the precision of closed-loop reaches is comparable between EDS and control groups, and also changes comparably with rotated training.
+
+> _There is no difference between the EDS and control group in how well or how quickly they adapted to the rotation, nor in their baseline closed-loop reach precision or it's decrease in the rotated session. That is: there are no a priori differences in closed-loop reaching between the groups that could be alternative explanations for performance differences on other tasks._
 
 # Reach Aftereffects in people with EDS and Controls
 
@@ -178,19 +221,27 @@ NoCursorANOVA(datatype='precision')
 
 As with reach aftereffects, there is an effect of training, but there is no effect of group or interaction between group and training. This ANOVA and the previous, taken together mean that the reach planning (internal models, if we must) is updated in an equal way in both groups.
 
+> _There is no difference between the EDS and control group in the extent of implicit reach aftereffects, or the precision of open-loop reaches and how they change with rotated training. This means these are ruled out as alternative explanations for any other differences we find in localization._
+
 # Localization
 
 So now we will look at the measure of interest: hand localization. But before testing the precision of hand localization, we will first test if it shifts and if it shifts differently from the control group. Based on our earlier study with people with EDS, we do not expect this.
 
 First a plot of the shifts in localization responses, induced by rotated training:
 
-```{r fig.width=8, fig.height=6}
+```{r fig.width=8, fig.height=8}
 plotLocalizationShifts(target='inline')
 ```
 
-To clarify, all figures have the aligned localization responses subtracted.
+To clarify, all data have the aligned localization responses subtracted, except the first two panels, which show the interpolated trends in the aligned localization tasks.
 
-Looks like there is an effect of training on localization (data in panels A & B seem different from 0). It also looks like there is no difference between the two groups (controls and people with EDS) in both the active and passive localization. It does seem like there is a difference between shifts in active and passive hand localization (data in panel C is somewhat different from 0), but it's unclear if there is a group difference there. Let's run a bunch of ANOVA's.
+## Baseline biases
+
+**No analyses done yet.** Looks like there is no difference.
+
+## Training induced localization shifts
+
+Looks like there is an effect of training on localization (data in panels C & D seem different from 0). It also looks like there is no difference between the two groups (controls and people with EDS) in both the active and passive localization. It does seem like there is a difference between shifts in active and passive hand localization (data in panel E is somewhat different from 0), but it's unclear if there is a group difference there. Let's run a bunch of ANOVA's.
 
 What are the factors?
 
@@ -202,7 +253,9 @@ localizationAOV()
 
 This mostly confirms what the figure shows: effects of training on localization, a difference between active and passive localization, but no effects of group. There is one oddity: the effect of passive vs. active localization interacts with the effect of hand angle in the omnibus ANOVA. This may be explained by the almost flat passive localization curves, while in active localization, the shifts appear larger at 45 and 90 degrees compared to 135. However, even if this is the case here, that should not concern our main question.
 
-# Localization precision
+> _There is no difference between the EDS and control group in their localization shifts, so this can not be an alternative explanation for any differences we might find in localization precision._
+
+## Localization precision
 
 Now the interesting part. We've mostly not seen any differences between the two groups which is what we expected. The exception is the _with strategy_ reach aftereffects, but for the current study, the more important issue is that there were no group effects on any of the localization measures. The question is if using this fast method of assessing proprioceptive recalibration we find the same effect as earlier (Clayton et al., XXXX) [@Clayton1234]: that people with EDS have larger/smaller proprioceptive precision. (The wider confidence interval in the group of people with EDS in the difference between active and passive localization shifts may be due to differences between individuals localization shifts, but not their proprioceptive hand localization precision.)
 
@@ -227,6 +280,8 @@ localicalizationSTDt.tests()
 So apart from in aligned & active localization, people with EDS are indeed less precise in localizing their hand as compared to age-matched controls without EDS.
 
 It also seems that the difference between active and passive is mostly the same within all conditions and groups. But, as mentioned, for the EDS group, active localization after aligned training might be more precise (lower variance) than in the other three conditions. Perhaps before changing it up with adaptation, the signal from predicted sensory consequences provides enough extra information to make a difference for hand location estimation.
+
+> _As we predicted there is a difference in the precision of localization between people with EDS and controls: people with EDS seems to have slighthly lower hand localization precision. Importantly, this can not be explained by closed-loop reach precision, adaptation rate and extent, open-loop reach precision, implicit adaptation and hand localization shifts. Interestingly, there is no such difference in the aligned, active localization._
 
 # EDS indicators and hand localization precision
 
@@ -264,15 +319,16 @@ Unfortunately, the predictions are useless in the condition that would be most e
 
 Here is a list of findings / results:
 
-- the EDS and control group adapted equally
-- the EDS and control group had equal implicit (without strategy) reach aftereffects
-- there is a difference between EDS and control in the explicit (with strategy) reach aftereffects, which may be due to an uncharacteristic control group (cf. Modchalingam et al., 2019)
-- the EDS and control group shifted their localization responses equally
+- The EDS and control group adapted equally.
+- Closed-loop reach precision, as well as the increase in closed-loop reach precision with rotated training was comparable between groups.
+- The EDS and control group had equal implicit (without strategy) reach aftereffects.
+- EDS and control group had comparable open-loop reach precision as well as a comparable rotation-induced increase in open-loop reach precision.
+- The EDS and control group shifted their localization responses equally, and had comparable aligned localization errors overall.
 
-So far, these are just checks to see if the experiment worked.
+This rules out many alternative explanations for the interesting findings:
 
-- the EDS group was less precise in hand localization compared to the control group, except perhaps in the aligned/active condition
-- Beighton scores predict overall hand localization precision (across both groups), and while hand localization precision has some predictive power of which group a participant is in, it's differentiation is not great
+- The EDS group was less precise in hand localization compared to the control group, except perhaps in the aligned/active condition (as predicted / confirming our earlier paper).
+- Beighton scores predict overall hand localization precision (across both groups), and while hand localization precision has some predictive power of which group a participant is in, it's differentiation is not great.
 
 # Store figures
 
