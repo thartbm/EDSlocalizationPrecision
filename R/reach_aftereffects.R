@@ -17,7 +17,6 @@ getAllNoCursors <- function(groups=c('sEDS','zEDS')) {
     filename <- sprintf('data/%s_nocursor_var.csv',group)
     write.csv(filename,x=groupdf,row.names=FALSE,quote=FALSE)
     
-    
   }
   
 }
@@ -257,7 +256,7 @@ getParticipantNoCursorVars <- function(participant) {
 plotReachAftereffects <- function(target='inline') {
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig4.svg', width=8, height=3, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig4.svg', width=7.5, height=5.5, system_fonts=list(sans='Arial'))
   }
   
   styles <- getStyle()
