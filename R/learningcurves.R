@@ -52,6 +52,8 @@ getParticipantLearningCurve <- function(participant) {
   # for now we will use the final one third of each set
   alignedBiases <- getAlignedBiases(alignedReachAngles)
   
+  #str(alignedReachAngles$trial)
+  
   rotatedreachfile <- pdf[pdf$ID==participant,"rotated_train"]
   rotatedreachfile <- sprintf('data/%s/%s/%s',folder,participant,rotatedreachfile)
   rotatedReachAngles <- getReachAngles(rotatedreachfile)
@@ -270,6 +272,119 @@ getBlockedLearningCurves <- function(group, blockdefs) {
   
 }
 
+getReachPrecision <- function(groups = c('sEDS','zEDS')) {
+  
+  for (groupno in 1:length(groups)) {
+    
+    groupReachPrecision = getGroupReachPrecision(groups[groupno])
+    
+    filename <- sprintf('data/%s_training_var.csv',groups[groupno])
+    
+    write.csv(filename,x=groupReachPrecision,row.names=FALSE,quote=FALSE)
+    
+  }
+  
+}
+
+getGroupReachPrecision <- function(group) {
+  
+  # determine which participants are in this group, based on the main participants.csv
+  participants <- getGroupParticipants(group)
+  
+  # for every participant, we'll get the reach precision in the last 15 trials 
+  # of the first aligned and rotated training session
+  aligned <- c()
+  rotated <- c()
+  
+  for (participant in participants) {
+    
+    pdf <- read.csv('data/participants_files.csv',stringsAsFactors=FALSE)
+    
+    folder <- pdf[pdf$ID==participant, "folder"]
+    
+    columnnames <- c("trial", "target", "Xcursor","Ycursor","Xrobot","Yrobot","XscreenO","YscreenO","Xhome","Yhome","XTarget","Ytarget","blocknumber","rotation","time","trialselected","sampleselected","sampleinterpolated","maxvelocity","unsure")
+    
+    alignedreachfile <- pdf[pdf$ID==participant,"aligned_train"]
+    alignedreachfile <- sprintf('data/%s/%s/%s',folder,participant,alignedreachfile)
+    
+    alignedreachdf <- read.table(alignedreachfile,stringsAsFactors=FALSE, col.names=columnnames, row.names = NULL);
+    alignedreachdf <- alignedreachdf[which(alignedreachdf$trial > 30 & alignedreachdf$trial < 46),]
+    
+    alignedreachdeviations <- getDFreachAngles(alignedreachdf)
+    alignedreachdeviations <- removeTargetBias(alignedreachdeviations)
+    
+    aligned <- c(aligned, sd(alignedreachdeviations$angular_deviation, na.rm=TRUE))
+    
+    #getTrialReachAngleAt(trialdf, location='maxvel')
+    
+    rotatedreachfile <- pdf[pdf$ID==participant,"rotated_train"]
+    rotatedreachfile <- sprintf('data/%s/%s/%s',folder,participant,rotatedreachfile)
+    
+    rotatedreachdf <- read.table(rotatedreachfile,stringsAsFactors=FALSE, col.names=columnnames, row.names = NULL);
+    rotatedreachdf <- rotatedreachdf[which(rotatedreachdf$trial > 75 & rotatedreachdf$trial < 91),]
+    
+    rotatedreachdeviations <- getDFreachAngles(rotatedreachdf)
+    rotatedreachdeviations <- removeTargetBias(rotatedreachdeviations)
+    
+    rotated <- c(rotated, sd(rotatedreachdeviations$angular_deviation, na.rm=TRUE))
+    
+  }
+  
+  reachPrecision <- data.frame('participant'=participants, aligned, rotated)
+  
+  return(reachPrecision)
+  
+}
+
+getDFreachAngles <- function(reachdf) {
+  
+  reachdf$Yrobot = reachdf$Yrobot + 8.5
+  
+  trials <- unique(reachdf$trial)
+  
+  ReachAngles = matrix(data=NA,nrow=length(trials),ncol=2)
+  
+  # loop through all trials to get 
+  for (trial.idx in 1:length(trials)) {
+    
+    trialno <- trials[trial.idx]
+    
+    # we need to check if the trial is actually in the data
+    if (length(which(reachdf$trial == trialno)) > 0) {
+      
+      trialdf <- reachdf[reachdf$trial == trialno,]
+      ReachAngles[trial.idx,1:2] <- getTrialReachAngleAt(trialdf, location='maxvel')
+      
+    }
+    # no else: if the trial is not there, the values remain NA
+    
+  }
+  
+  # convert to data frame
+  ReachAngles <- data.frame(ReachAngles)
+  
+  # set columns names so other functions know what to do whith this info:
+  colnames(ReachAngles) <- c('angular_deviation','target_angle')
+  
+  return(ReachAngles)
+  
+}
+
+removeTargetBias <- function(reachdf) {
+  
+  targets <- unique(reachdf$target_angle)
+  
+  for (target in targets) {
+    
+    idx <- which(reachdf$target_angle == target)
+    reachdf$angular_deviation[idx] <- reachdf$angular_deviation[idx] - mean(reachdf$angular_deviation[idx])
+    
+  }
+  
+  return(reachdf)
+  
+}
+
 # Figures -----
 
 plotLearningCurves <- function(target='inline') {
@@ -284,7 +399,7 @@ plotLearningCurves <- function(target='inline') {
   par(mar=c(4,4,2,0.1))
   
   
-  layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(3,2,2), heights=c(1,1))
+  layout(matrix(c(1,2,3,4,5,6), nrow=2, ncol=3, byrow = TRUE), widths=c(3,2,2), heights=c(1,1))
   
   # # # # # # # # # #
   # panel A: actual learning curves
