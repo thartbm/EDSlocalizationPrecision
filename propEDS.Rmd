@@ -70,7 +70,7 @@ We still need data. For this notebook, we can simply download pre-processed data
 ```{r}
 
 usePreprocessed <- TRUE
-usePreprocessed <- FALSE
+#usePreprocessed <- FALSE
 
 if (usePreprocessed) {
   
@@ -130,7 +130,7 @@ For the Results:
 First, we look at the adaptation to the 30 degree rotation, to see if the two groups adapt an equally amount and equally fast.
 
 Plot learning curves:
-```{r fig.width=8, fig.height=3}
+```{r fig.width=8, fig.height=6}
 plotLearningCurves(target='inline')
 ```
 
@@ -146,33 +146,37 @@ This ANOVA finds no difference between the two groups, nor an interaction betwee
 # Reach Aftereffects in people with EDS and Controls
 
 First a figure:
-```{r fig.width=8, fig.height=5.5}
+```{r fig.width=5.5, fig.height=5.5}
 plotReachAftereffects(target='inline')
 ```
 
-Now, we'll compare the aligned no-cursor deviations with those in the without strategy ("exclusive") no-cursor deviations after rotated training, in a mixed-design ANOVA with the between subjects factor _group_ (EDS or control) and the within subject factor _training_ (aligned or rotated).
+Now, we'll compare the aligned no-cursor deviations with no-cursor deviations after rotated training, in a mixed-design ANOVA with the between subjects factor _group_ (EDS or control) and the within subject factor _training_ (aligned or rotated).
 
 ```{r}
 NoCursorANOVA()
 ```
 
-There is an effect of training, but no effect of group and no interaction between group and training. We interpret this to mean that there is no discernable difference between the groups in their level of adaptation as measured by the shift from no-cursor reach deviations after aligned cursor training to those in "without strategy" no-cursor reach deviations after rotated training.
+There is an effect of training, but no effect of group and no interaction between group and training. We interpret this to mean that there is no discernable difference between the groups in their level of implicit adaptation as measured by the shift from no-cursor reach deviations after aligned cursor training to those in "without strategy" no-cursor reach deviations after rotated training.
 
-Now, let's see if there is any effect of group (EDS or control) on the effect of doing no-cursor reaches with or without strategy:
+We do not analyse the ability to include strategies in reach aftereffects. We expect neither the controls nor the EDS group to be able to do this, as they receieved no instructions (Modchalingam et al., 2019). However, there are some functions in 'R/reachaftereffects.R' which show that unexpectedly, the controls do show a difference between with and without strategy reach aftereffects, while the EDS group does not. This seems to mean that the controls here behave atypically, but it is beside the point. Here we included the with strategy and without strategy conditions to make sure that in the without strategy condition, we really have a measure of implicit adaptation, which is what we are really interested in. While we don't know how the control group here did acquire a strategy, at least the EDS group is indistinguishable from the participants doing an identical protocol in our earlier study, and implicit learning is equal in both our EDS and control group.
 
-```{r}
-RAE.ANOVA()
-```
+## No-cursor reach precision
 
-There is indeed a weak interaction between group and strategy use (F(1,28)=4.52, p=.042, $\eta^2$=0.05). There seems to indeed be a small difference between the EDS and control groups in the reach aftereffects _with_ strategy, and we'll verify this. However, it doesn't seem like there is a (big) difference within each group between _with_ and _without_ strategy reach aftereffects, which we'll test now.
+Closer to our interest is the precision with which people reach while not seeing their hand. First, we'll test if there is an a-priori difference between the two groups, by comparing the precision in the aligned condition, using a t-test.
 
 ```{r}
-NoCursorTtests()
+RAEprecisionTtest()
 ```
 
-Some people in the control group here were apparently able to develop a strategy given only a 30 degree rotation and no instruction (contrary to our earlier findings: Modchalingam et al., 2019). Perhaps a few people in the group of participants with EDS were also able to develop a strategy, but not so many that it caused a difference between this group's averages in the _with_ and _without_ strategy conditions.
+There is no a priori difference in no-cursor reach precision between the groups.
 
-This does not necessarily mean that there is an effect of EDS on explicit learning. Rather it seems that the control group we measured here is somewhat different from the control group we recorded for an earlier study, while the EDS group is not [Modchalingam et al., 2019].
+To test if the rotated training induced different changes in the precision for the two groups, we'll do a mixed-effect ANOVA on no-cursor reach precision using training (aligned or rotated) as a within-subjects factor and group (control or EDS) as a between-subjects factor.
+
+```{r}
+NoCursorANOVA(datatype='precision')
+```
+
+As with reach aftereffects, there is an effect of training, but there is no effect of group or interaction between group and training. This ANOVA and the previous, taken together mean that the reach planning (internal models, if we must) is updated in an equal way in both groups.
 
 # Localization
 
@@ -278,7 +282,7 @@ This chunk of code merely stores all the figures as SVG files in the `doc/` fold
 plotLearningCurves(target='svg')
 plotReachAftereffects(target='svg')
 plotLocalizationShifts(target='svg')
-plotLocalizationVariance(target='svg')
+#plotLocalizationVariance(target='svg')
 plotBeightonLocSTD(target='svg')
 ```
 
