@@ -392,7 +392,7 @@ plotLearningCurves <- function(target='inline') {
   styles <- getStyle()
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig3.svg', width=8, height=3, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig3.svg', width=7.5, height=5.5, system_fonts=list(sans='Arial'))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
