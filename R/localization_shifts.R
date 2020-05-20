@@ -431,13 +431,54 @@ plotLocalizationShifts <- function(target='inline') {
   styles <- getStyle()
   
   if (target == 'svg') {
-    svglite(file='doc/Fig5.svg', width=7.5, height=3, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig5.svg', width=7.5, height=8, system_fonts=list(sans='Arial'))
   }
   
-  par(mfrow=c(2,3), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  layout(matrix(c(1,1,1,2,2,2,3,3,4,4,5,5,6,6,7,7,8,8), nrow=3, ncol=6, byrow = TRUE))
   
   # # # # # # # # # #
-  # panels A & B: active and passive localization
+  # panels A & B: aligned active and passive localization biases
+  
+  for (reachtype.idx in 1:2) {
+    
+    reachtype <- c('active','passive')[reachtype.idx]
+    
+    passive <- 2 - reachtype.idx
+    
+    plot(x=c(30,150),y=c(0,0),type='l',lty=2,col=rgb(127, 127, 127, 255, max = 255),xlim=c(30,150),ylim=c(-20,20),main=sprintf('aligned %s localization bias',reachtype),xlab='hand angle [°]',ylab='localization bias [°]',axes=FALSE,font.main=1)
+  
+    mtext(c('A','B')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+    axis(1, at=c(45,90,135),cex.axis=0.85)
+    axis(2, at=c(-20,-10,0,10,20),cex.axis=0.85)
+    
+    for (groupno in c(1:length(styles$group))) {
+      
+      group <- styles$group[groupno]
+      
+      localization <- read.csv(sprintf('data/%s_localizationbias.csv',group))
+      localization <- localization[which(localization$passive == passive & localization$rotated == 0),]
+      
+      participants <- unique(localization$participant)
+      
+      for (participant in participants) {
+        
+        partbias <- localization[which(localization$participant == participant),]
+        lines(partbias$handlocation_deg, partbias$localizationbias_deg, col=as.character(styles$color_trans[groupno]))
+        
+      }
+      
+      groupbias <- aggregate(localizationbias_deg ~ handlocation_deg, data=localization, FUN=mean, na.rm=F)
+      idx <- which(groupbias$handlocation_deg >= 50 & groupbias$handlocation_deg <= 130)
+      lines(groupbias$handlocation_deg[idx], groupbias$localizationbias_deg[idx], col=as.character(styles$color_solid[groupno]), lw=2, lty=1)
+      
+    }
+  
+  }
+  
+  # # # # # # # # # #
+  # panels C & D: active and passive localization
   
   for (reachtype.idx in 1:2) {
     
@@ -447,7 +488,7 @@ plotLocalizationShifts <- function(target='inline') {
     plot(c(25,175),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='localization shift [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
     
     #mtext(c('A','B')[reachtype.idx], side=3, outer=TRUE, at=c(c(0,1/3)[reachtype.idx],1), line=-1, adj=0, padj=1)
-    mtext(c('A','B')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+    mtext(c('C','D')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
     
     axis(1, at=c(45,90,135),cex.axis=0.85)
     axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
@@ -512,7 +553,7 @@ plotLocalizationShifts <- function(target='inline') {
   plot(c(25,175),c(0,0),type='l',main='predicted consequences',xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='update [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
   
   #mtext('C', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
-  mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   axis(1, at=c(45,90,135),cex.axis=0.85)
   axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
@@ -608,7 +649,7 @@ plotLocalizationShifts <- function(target='inline') {
   plot(c(0.5,2.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,2.5),ylim=ylims,main='localization precision',xlab='condition',ylab='localization precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
   
   #mtext('D', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
-  mtext('D', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   avgLocCI <- aggregate(std ~ group + passive + rotated, data=locVar, FUN=t.interval)
   
   for (group in styles$group) {
@@ -658,7 +699,7 @@ plotLocalizationShifts <- function(target='inline') {
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='aligned localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
   
   #mtext('E', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
-  mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('G', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   ####
   
@@ -714,7 +755,7 @@ plotLocalizationShifts <- function(target='inline') {
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='rotated localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
   
   #mtext('F', side=3, outer=TRUE, at=c(2/3,0.5), line=-1, adj=0, padj=1)
-  mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('H', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   for (passive in c(0,1)) {
     
