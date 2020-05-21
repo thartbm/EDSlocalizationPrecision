@@ -13,13 +13,19 @@ getPreprocessedData <- function(check=TRUE,participantsOnly=FALSE) {
                   'sEDS_localization_tCI.csv' = 'https://osf.io/qzyut/download',
                   'sEDS_localization_var.csv' = 'https://osf.io/skv7u/download',
                   'sEDS_nocursors.csv'        = 'https://osf.io/shk29/download',
+                  'sEDS_nocursor_var.csv'     = 'https://osf.io/q57nw/download',
+                  'sEDS_training_var.csv'     = 'https://osf.io/t7c3u/download',
+                  'sEDS_localizationbias.csv' = 'https://osf.io/vzqc6/download',
                   
                   'zEDS_curves.csv'           = 'https://osf.io/tbj6s/download',
                   'zEDS_loc_AOV.csv'          = 'https://osf.io/4rcdt/download',
                   'zEDS_localization.csv'     = 'https://osf.io/er97w/download',
                   'zEDS_localization_tCI.csv' = 'https://osf.io/muygq/download',
                   'zEDS_localization_var.csv' = 'https://osf.io/9tcp8/download',
-                  'zEDS_nocursors.csv'        = 'https://osf.io/wgnfq/download'
+                  'zEDS_nocursors.csv'        = 'https://osf.io/wgnfq/download',
+                  'zEDS_nocursor_var.csv'     = 'https://osf.io/frcax/download',
+                  'zEDS_training_var.csv'     = 'https://osf.io/ehtsy/download',
+                  'zEDS_localizationbias.csv' = 'https://osf.io/j3ce8/download'
     
   )
   
