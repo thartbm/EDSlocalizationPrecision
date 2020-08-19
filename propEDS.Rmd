@@ -5,10 +5,10 @@ author:
 - Bernard Marius 't Hart
 - Denise Y.P. Henriques
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-  word_document: default
 ---
 
 

@@ -471,6 +471,18 @@ plotLocalizationShifts <- function(target='inline') {
       
       groupbias <- aggregate(localizationbias_deg ~ handlocation_deg, data=localization, FUN=mean, na.rm=F)
       idx <- which(groupbias$handlocation_deg >= 50 & groupbias$handlocation_deg <= 130)
+      
+      pX <- c()
+      pY <- c()
+      
+      for (handangle in seq(130,50,-1)) {
+        CI <- t.interval(localization$localizationbias_deg[which(localization$handlocation_deg == handangle)])
+        pX <- c(handangle, pX, handangle)
+        pY <- c(CI[1], pY, CI[2])
+      }
+      
+      polygon(pX, pY, col=as.character(styles$color_trans[groupno]), border=NA)
+      
       lines(groupbias$handlocation_deg[idx], groupbias$localizationbias_deg[idx], col=as.character(styles$color_solid[groupno]), lw=2, lty=1)
       
     }
