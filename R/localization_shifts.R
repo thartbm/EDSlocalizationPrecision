@@ -840,67 +840,82 @@ localizationAOV <- function(groups=c('sEDS','zEDS')) {
   library(data.table)
   setnames(df, old = c('participant','rotated_b','passive_b','handangle_deg'), new = c('subject','rotated','passive','angle'))
   
-  factorvars <- c('group', 'subject', 'rotated', 'passive', 'angle')
+  
+  dfs <- aggregate(cbind(group, bias_deg) ~ rotated + passive + subject, data=df, FUN=mean)
+  dfs$group <- factor(dfs$group, levels=c(1,2), labels=c('control', 'EDS'))
+  
+  
+  factorvars <- c('subject', 'rotated', 'passive')
   
   for (fv in factorvars) {
     
-    df[,fv] <- as.factor(df[,fv])
+    dfs[,fv] <- as.factor(dfs[,fv])
     
   }
   
   # full ANOVA:
   print('*** full ANOVA')
-  print(ezANOVA(data=df,dv=bias_deg,wid=subject,within=c(rotated,passive,angle),between=group,type=3))
+#  print(ezANOVA(data=df,dv=bias_deg,wid=subject,within=c(rotated,passive,angle),between=group,type=3))
+  print(ezANOVA(data=dfs,dv=bias_deg,wid=subject,within=c(rotated,passive),between=group,type=3))
   
   # ANOVA on change in localization:
-  for (passive in c(0,1)) {
-    print(c('*** active','*** passive')[passive+1])
-    print(ezANOVA(data=df[which(df$passive == passive),],dv=bias_deg,wid=subject,diff=rotated,within=c(angle),between=group,type=3))
-  }
+  # for (passive in c(0,1)) {
+  #   print(c('*** active','*** passive')[passive+1])
+  #   print(ezANOVA(data=df[which(df$passive == passive),],dv=bias_deg,wid=subject,diff=rotated,within=c(angle),between=group,type=3))
+  # }
+  # 
+  # group_col <- c()
+  # subject_col <- c()
+  # angle_col <- c()
+  # bias_col <- c()
+  # 
+  # for (participant in unique(df$subject)) {
+  #   
+  #   group <- df$group[df$subject == participant][1]
+  #   
+  #   for (angle in unique(df$angle)) {
+  #     
+  #     act_al <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 0) & (df$passive == 0)]
+  #     act_ro <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 1) & (df$passive == 0)]
+  #     pas_al <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 0) & (df$passive == 1)]
+  #     pas_ro <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 1) & (df$passive == 1)]
+  #     
+  #     act_bias_shift <- act_ro - act_al
+  #     pas_bias_shift <- pas_ro - pas_al
+  #     
+  #     bias <- act_bias_shift - pas_bias_shift
+  #     
+  #     # add to lists:
+  #     group_col <- c(group_col, group)
+  #     subject_col <- c(subject_col, participant)
+  #     angle_col <- c(angle_col, angle)
+  #     bias_col <- c(bias_col, bias)
+  #     
+  #   }
+  #   
+  # }
+  # 
+  # df2 <- data.frame(group_col,subject_col,angle_col,bias_col)
+  # colnames(df2) <- c('group', 'subject', 'angle', 'bias_deg')
+  # factorvars <- c('group', 'subject', 'angle')
+  # 
+  # for (fv in factorvars) {
+  #   
+  #   df2[,fv] <- as.factor(df2[,fv])
+  #   
+  # }
+  # 
+  # 
+  # # ANOVA on change in predicted sensory consequences
+  # print('*** predicted consequences')
+  # print(ezANOVA(data=df2,dv=bias_deg,wid=subject,within=angle,between=group,type=3))
   
-  group_col <- c()
-  subject_col <- c()
-  angle_col <- c()
-  bias_col <- c()
+  dfd <- aggregate(bias_deg ~ passive + subject, data=dfs, FUN=diff)
+  dfd$group <- dfs$group[which(dfs$passive == 0)]
   
-  for (participant in unique(df$subject)) {
-    
-    group <- df$group[df$subject == participant][1]
-    
-    for (angle in unique(df$angle)) {
-      
-      act_al <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 0) & (df$passive == 0)]
-      act_ro <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 1) & (df$passive == 0)]
-      pas_al <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 0) & (df$passive == 1)]
-      pas_ro <- df$bias[(df$subject == participant) & (df$angle == angle) & (df$rotated == 1) & (df$passive == 1)]
-      
-      act_bias_shift <- act_ro - act_al
-      pas_bias_shift <- pas_ro - pas_al
-      
-      bias <- act_bias_shift - pas_bias_shift
-      
-      # add to lists:
-      group_col <- c(group_col, group)
-      subject_col <- c(subject_col, participant)
-      angle_col <- c(angle_col, angle)
-      bias_col <- c(bias_col, bias)
-      
-    }
-    
-  }
-  
-  df2 <- data.frame(group_col,subject_col,angle_col,bias_col)
-  colnames(df2) <- c('group', 'subject', 'angle', 'bias_deg')
-  factorvars <- c('group', 'subject', 'angle')
-  
-  for (fv in factorvars) {
-    
-    df2[,fv] <- as.factor(df2[,fv])
-    
-  }
+  # ANOVA on localization shifts
+  print('*** localization shifts')
+  print(ezANOVA(data=dfd,dv=bias_deg,wid=subject,between=group,within=passive,type=3))
   
   
-  # ANOVA on change in predicted sensory consequences
-  print('*** predicted consequences')
-  print(ezANOVA(data=df2,dv=bias_deg,wid=subject,within=angle,between=group,type=3))
 }

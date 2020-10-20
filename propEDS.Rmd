@@ -251,7 +251,7 @@ angle = hand angle: one of 45, 90 and 135
 localizationAOV()
 ```
 
-This mostly confirms what the figure shows: effects of training on localization, a difference between active and passive localization, but no effects of group. There is one oddity: the effect of passive vs. active localization interacts with the effect of hand angle in the omnibus ANOVA. This may be explained by the almost flat passive localization curves, while in active localization, the shifts appear larger at 45 and 90 degrees compared to 135. However, even if this is the case here, that should not concern our main question.
+This mostly confirms what the figure shows: effects of training on localization, a difference between active and passive localization, but no effects of group.
 
 > _There is no difference between the EDS and control group in their localization shifts, so this can not be an alternative explanation for any differences we might find in localization precision._
 
