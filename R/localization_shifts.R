@@ -436,7 +436,15 @@ plotLocalizationShifts <- function(target='inline') {
   
   par(mar=c(4,4,2,0.1))
   
-  layout(matrix(c(1,1,1,2,2,2,3,3,4,4,5,5,6,6,7,7,8,8), nrow=3, ncol=6, byrow = TRUE))
+  # 1   2
+  # 3 4 5
+  # 6 7 8
+  # layout(matrix(c(1,1,1,2,2,2,3,3,4,4,5,5,6,6,7,7,8,8), nrow=3, ncol=6, byrow = TRUE))
+  
+  # 1   2
+  # 3   4
+  # 5 6 7
+  layout(matrix(c(1,1,1,2,2,2,3,3,3,4,4,4,5,5,6,6,7,7), nrow=3, ncol=6, byrow = TRUE))
   
   # # # # # # # # # #
   # panels A & B: aligned active and passive localization biases
@@ -562,77 +570,78 @@ plotLocalizationShifts <- function(target='inline') {
     
   }
   
-  plot(c(25,175),c(0,0),type='l',main='predicted consequences',xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='update [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
+  legend(130,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
   
-  #mtext('C', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
-  mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  # # # # # # # # # #
+  # panel E: predicted sensory consequences
   
-  axis(1, at=c(45,90,135),cex.axis=0.85)
-  axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
-  
-  for (groupno in c(1:length(styles$group))) {
-    
-    group <- styles$group[groupno]
-    
-    localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
-    
-    angles <- localization$angle
-    lo <- localization$PredCons_p2.5
-    hi <- localization$PredCons_p97.5
-    
-    idx <- which((angles >= 30) & (angles <= 150))
-    
-    coord.x = c(angles[idx],rev(angles[idx]));
-    coord.y = c(lo[idx],rev(hi[idx]))
-    polygon(coord.x,coord.y,col=as.character(styles$color_trans[groupno]),border=NA)
-    
-  }
-  
-  for (groupno in c(1:length(styles$group))) {
-    
-    group <- styles$group[groupno]
-    
-    localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
-    
-    angles <- localization$angle
-    PSQ <- localization$PredCons_p50
-    
-    idx <- which(is.finite(PSQ) & (angles >= 30) & (angles <= 150))
-    
-    lines(angles[idx],PSQ[idx],col=as.character(styles$color_solid[groupno]),lw=2,lty=styles$linestyle[groupno])
-    
-  }
-  
-  # #   # ADD AVERAGE DOTS
-  # #   
-  for (groupno in c(1:length(styles$group))) {
-    
-    group <- styles$group[groupno]
-    
-    shifts <- list()
-    
-    for (reachtype.idx in c(1,2)) {
-      localization <- read.csv(sprintf('data/%s_loc_AOV.csv',group))
-      localization <- localization[which(localization$passive_b == (reachtype.idx-1)),]
-      localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
-      shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
-      shifts[[reachtype.idx]] <- shift
-    }
-    
-    shift <- shifts[[1]] - shifts[[2]]
-    
-    xloc <- 155 + (groupno*4)
-    CI <- t.interval(shift)
-    #arrows(xloc, CI[2], xloc, CI[1], length=0.05, angle=90, code=3, col=as.character(styles$color[groupno]), lty=styles$linestyle[groupno])
-    lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
-    lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
-    lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
-    points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19)
-    
-  }
-  
-  
-  legend(60,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
+  # plot(c(25,175),c(0,0),type='l',main='predicted consequences',xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='update [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
+  # 
+  # mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  # 
+  # axis(1, at=c(45,90,135),cex.axis=0.85)
+  # axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
+  # 
+  # for (groupno in c(1:length(styles$group))) {
+  #   
+  #   group <- styles$group[groupno]
+  #   
+  #   localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
+  #   
+  #   angles <- localization$angle
+  #   lo <- localization$PredCons_p2.5
+  #   hi <- localization$PredCons_p97.5
+  #   
+  #   idx <- which((angles >= 30) & (angles <= 150))
+  #   
+  #   coord.x = c(angles[idx],rev(angles[idx]));
+  #   coord.y = c(lo[idx],rev(hi[idx]))
+  #   polygon(coord.x,coord.y,col=as.character(styles$color_trans[groupno]),border=NA)
+  #   
+  # }
+  # 
+  # for (groupno in c(1:length(styles$group))) {
+  #   
+  #   group <- styles$group[groupno]
+  #   
+  #   localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
+  #   
+  #   angles <- localization$angle
+  #   PSQ <- localization$PredCons_p50
+  #   
+  #   idx <- which(is.finite(PSQ) & (angles >= 30) & (angles <= 150))
+  #   
+  #   lines(angles[idx],PSQ[idx],col=as.character(styles$color_solid[groupno]),lw=2,lty=styles$linestyle[groupno])
+  #   
+  # }
+  # 
+  # for (groupno in c(1:length(styles$group))) {
+  #   
+  #   group <- styles$group[groupno]
+  #   
+  #   shifts <- list()
+  #   
+  #   for (reachtype.idx in c(1,2)) {
+  #     localization <- read.csv(sprintf('data/%s_loc_AOV.csv',group))
+  #     localization <- localization[which(localization$passive_b == (reachtype.idx-1)),]
+  #     localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
+  #     shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
+  #     shifts[[reachtype.idx]] <- shift
+  #   }
+  #   
+  #   shift <- shifts[[1]] - shifts[[2]]
+  #   
+  #   xloc <- 155 + (groupno*4)
+  #   CI <- t.interval(shift)
+  #   lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
+  #   lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
+  #   lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
+  #   points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19)
+  #   
+  # }
+  # 
+  # 
+  # legend(60,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
   
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -656,12 +665,12 @@ plotLocalizationShifts <- function(target='inline') {
   ylims <- c(0,16)
   
   # # # # # # # # # #
-  # panel D: localization variance as in ANOVA
+  # panel F/E: localization variance as in ANOVA
   
   plot(c(0.5,2.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,2.5),ylim=ylims,main='localization precision',xlab='condition',ylab='localization precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
   
   #mtext('D', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
-  mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   avgLocCI <- aggregate(std ~ group + passive + rotated, data=locVar, FUN=t.interval)
   
   for (group in styles$group) {
@@ -705,13 +714,12 @@ plotLocalizationShifts <- function(target='inline') {
   
   
   # # # # # # # # # #
-  # panel E: aligned localization variance descriptives
+  # panel G/F: aligned localization variance descriptives
   
   
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='aligned localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
   
-  #mtext('E', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
-  mtext('G', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   ####
   
@@ -760,14 +768,13 @@ plotLocalizationShifts <- function(target='inline') {
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
   #
-  # panel F: rotated localization variance descriptives
+  # panel F/G: rotated localization variance descriptives
   #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
   
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='rotated localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
   
-  #mtext('F', side=3, outer=TRUE, at=c(2/3,0.5), line=-1, adj=0, padj=1)
-  mtext('H', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  mtext('G', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   for (passive in c(0,1)) {
     
