@@ -178,7 +178,7 @@ circleFit <- function(x, y, radius=12, verbosity=0) {
     lower <- c(min(coords$x)-radius,min(coords$x)-radius)
     upper <- c(max(coords$x)+radius,max(coords$y)+radius)
     
-    circlefit <- optimx(par=c('x'=0, 'y'=0), SMCL::circleFitError, gr = NULL, method='L-BFGS-B', lower=lower, upper=upper, coords=coords, radius=radius)
+    circlefit <- optimx(par=c('x'=0, 'y'=0), circleFitError, gr = NULL, method='L-BFGS-B', lower=lower, upper=upper, coords=coords, radius=radius)
     
     return(list('x'=circlefit$x, 'y'=circlefit$y))
     
@@ -186,7 +186,7 @@ circleFit <- function(x, y, radius=12, verbosity=0) {
     
     if (verbosity > 0) cat('optimx not installed, falling back on optim\n')
     
-    circlefit <-  optim(par = c('x'=0, 'y'=0), SMCL::circleFitError, gr = NULL, coords=coords, radius=radius)
+    circlefit <-  optim(par = c('x'=0, 'y'=0), circleFitError, gr = NULL, coords=coords, radius=radius)
     
     return(list('x'=circlefit$par['x'],'y'=circlefit$par['y']))
     
@@ -430,11 +430,16 @@ plotLocalizationShifts <- function(target='inline') {
   
   styles <- getStyle()
   
+  fw <- styles$figwidth[1]
+  fh <- fw * (8/7.5)
+  fs <- styles$fontsize[1]
+  fs <- 0.85
+  
   if (target == 'svg') {
-    svglite(file='doc/Fig5.svg', width=7.5, height=8, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig5.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
   
-  par(mar=c(4,4,2,0.1))
+  #par(mar=c(4,4,2,0.1))
   
   # 1   2
   # 3 4 5
@@ -446,6 +451,9 @@ plotLocalizationShifts <- function(target='inline') {
   # 5 6 7
   layout(matrix(c(1,1,1,2,2,2,3,3,3,4,4,4,5,5,6,6,7,7), nrow=3, ncol=6, byrow = TRUE))
   
+  par(mar=c(3,3,2,0.1), cex=1, cex.main=1, cex.axis=0.85, cex.lab=0.85, mgp=c(3,.75,0))
+  
+  
   # # # # # # # # # #
   # panels A & B: aligned active and passive localization biases
   
@@ -455,11 +463,15 @@ plotLocalizationShifts <- function(target='inline') {
     
     passive <- 2 - reachtype.idx
     
-    plot(x=c(30,150),y=c(0,0),type='l',lty=2,col=rgb(127, 127, 127, 255, max = 255),xlim=c(30,150),ylim=c(-20,20),main=sprintf('aligned %s localization bias',reachtype),xlab='hand angle [°]',ylab='localization bias [°]',axes=FALSE,font.main=1)
+    #plot(x=c(30,150),y=c(0,0),type='l',lty=2,col=rgb(127, 127, 127, 255, max = 255),xlim=c(30,150),ylim=c(-17,17),main=sprintf('%s localization bias',reachtype),xlab='hand angle [°]',ylab='localization bias [°]',axes=FALSE,font.main=1)
+    plot(x=c(30,150),y=c(0,0),type='l',lty=2,col=rgb(127, 127, 127, 255, max = 255),xlim=c(30,150),ylim=c(-17,17),main=sprintf('%s localization bias',reachtype),xlab='',ylab='',axes=FALSE,font.main=1)
+    
+    title(xlab='hand angle [°]', line=2)
+    title(ylab='localization bias [°]', line=2)
   
     mtext(c('A','B')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
-    axis(1, at=c(45,90,135),cex.axis=0.85)
-    axis(2, at=c(-20,-10,0,10,20),cex.axis=0.85)
+    axis(1, at=c(45,90,135),cex.axis=fs)
+    axis(2, at=c(-12,0,12),cex.axis=fs)
     
     for (groupno in c(1:length(styles$group))) {
       
@@ -505,13 +517,17 @@ plotLocalizationShifts <- function(target='inline') {
     reachtype <- c('active','passive')[reachtype.idx]
     
     # create plot panel with the right properties
-    plot(c(25,175),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='localization shift [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
+    #plot(c(25,175),c(0,0),type='l',main=sprintf('%s shift',reachtype),xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='localization shift [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
+    plot(c(25,175),c(0,0),type='l',main=sprintf('%s shift',reachtype),xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='', ylab='',lty=2,col=rgb(.5,.5,.5),font.main=1)
+    
+    title(xlab='hand angle [°]', line=2)
+    title(ylab='localization shift [°]', line=2)
     
     #mtext(c('A','B')[reachtype.idx], side=3, outer=TRUE, at=c(c(0,1/3)[reachtype.idx],1), line=-1, adj=0, padj=1)
     mtext(c('C','D')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
     
-    axis(1, at=c(45,90,135),cex.axis=0.85)
-    axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
+    axis(1, at=c(45,90,135),cex.axis=fs)
+    axis(2, at=c(0,-6,-12),cex.axis=fs)
     
     
     for (groupno in c(1:length(styles$group))) {
@@ -558,19 +574,19 @@ plotLocalizationShifts <- function(target='inline') {
       localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
       shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
       
-      xloc <- 155 + (groupno*4)
+      xloc <- 150 + (groupno*6)
       CI <- t.interval(shift)
       #arrows(xloc, CI[2], xloc, CI[1], length=0.05, angle=90, code=3, col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
       lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
-      lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
-      lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
-      points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19)
+      #lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
+      #lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
+      points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=16, cex=styles$pointsize[2])
       
     }
     
   }
   
-  legend(130,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
+  legend(90,-17.5,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=fs, seg.len=3)
   
   # # # # # # # # # #
   # panel E: predicted sensory consequences
@@ -662,12 +678,16 @@ plotLocalizationShifts <- function(target='inline') {
   
   # get the y-axis equal for all panels:
   
-  ylims <- c(0,16)
+  ylims <- c(0,12) # one individual point now falls of the figure
   
   # # # # # # # # # #
   # panel F/E: localization variance as in ANOVA
   
-  plot(c(0.5,2.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,2.5),ylim=ylims,main='localization precision',xlab='condition',ylab='localization precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  #plot(c(0.5,2.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,2.5),ylim=ylims,main='localization\nprecision',xlab='condition',ylab='localization precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  plot(c(0.5,2.5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,2.5),ylim=ylims,main='localization\nprecision',xlab='',ylab='',xaxt='n',yaxt='n',bty='n',font.main=1)
+  
+  title(xlab='condition', line=2)
+  title(ylab='localization precision, SD [°]', line=2)
   
   #mtext('D', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
   mtext('E', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -710,14 +730,18 @@ plotLocalizationShifts <- function(target='inline') {
   }
   
   axis(side=1,at=c(1,2),labels=c('aligned','rotated'))
-  axis(side=2,at=seq(0,16,4))
+  axis(side=2,at=seq(0,12,4))
   
   
   # # # # # # # # # #
   # panel G/F: aligned localization variance descriptives
   
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='aligned localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  #plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='aligned',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='aligned',xlab='',ylab='',xaxt='n',yaxt='n',bty='n',font.main=1)
+  
+  title(xlab='condition', line=2)
+  title(ylab='precision, SD [°]', line=1)
   
   mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
@@ -740,7 +764,7 @@ plotLocalizationShifts <- function(target='inline') {
       
       Y <- locvars
       
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=styles$pointsize[2],col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=locvars, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
@@ -756,7 +780,7 @@ plotLocalizationShifts <- function(target='inline') {
       
       lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
       
-      points(x=Xoffset,y=mean(locvars),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      points(x=Xoffset,y=mean(locvars),pch=16,cex=styles$pointsize[2],col=as.character(styles$color_solid[groupno]))
       
     }
     
@@ -772,7 +796,11 @@ plotLocalizationShifts <- function(target='inline') {
   #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='rotated localization precision',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  #plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='rotated',xlab='condition',ylab='individual precision, SD [°]',xaxt='n',yaxt='n',bty='n',font.main=1)
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,main='rotated',xlab='',ylab='',xaxt='n',yaxt='n',bty='n',font.main=1)
+  
+  title(xlab='condition', line=2)
+  title(ylab='precision, SD [°]', line=1)
   
   mtext('G', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
@@ -793,7 +821,7 @@ plotLocalizationShifts <- function(target='inline') {
       
       Y <- locvars
       
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=styles$pointsize[2],col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=locvars, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
@@ -809,7 +837,7 @@ plotLocalizationShifts <- function(target='inline') {
       
       lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
       
-      points(x=Xoffset,y=mean(locvars),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      points(x=Xoffset,y=mean(locvars),pch=16,cex=styles$pointsize[2],col=as.character(styles$color_solid[groupno]))
       
     }
     
@@ -817,6 +845,9 @@ plotLocalizationShifts <- function(target='inline') {
   
   axis(side=1, at=c(1.5,3.5), labels=c('active','passive'))
   
+  if (target == 'svg') {
+    dev.off()
+  }
   
   
 }

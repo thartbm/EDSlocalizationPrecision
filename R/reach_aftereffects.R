@@ -255,11 +255,15 @@ getParticipantNoCursorVars <- function(participant) {
 
 plotReachAftereffects <- function(target='inline') {
   
+  styles <- getStyle()
+  
+  fw <- styles$figwidth[1]
+  fh <- fw * (2/3)
+  
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig4.svg', width=7.5, height=5.5, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig4.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
   
-  styles <- getStyle()
   
   #par(mfrow=c(1,1), mar=c(4,4,2,0.1))
   
@@ -269,9 +273,10 @@ plotReachAftereffects <- function(target='inline') {
   layout(matrix(c(1,2,3,4), nrow=2, ncol=2, byrow = TRUE), widths=c(1,1), heights=c(1,1))
   
   
-  ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
+  ylims=c(-.1,1.1)*max(styles$rotation)
+  
   plot(c(0.8,2.2),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.75,2.25),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='session',ylab='reach deviation [°]',main='no-cursor reaching',font.main=1)
+       xaxt='n',yaxt='n',xlab='session',ylab='reach deviation [°]',main='no-cursor reaching',font.main=1.2)
   
   #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
   mtext('A', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -325,7 +330,7 @@ plotReachAftereffects <- function(target='inline') {
   
   
   plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='group',ylab='individual reach aftereffects [°]',main='reach aftereffects',font.main=1)
+       xaxt='n',yaxt='n',xlab='group',ylab='reach aftereffects [°]',main='reach aftereffects',font.main=1.2)
   
   
   #mtext('B', side=3, outer=TRUE, at=c(2/5,1), line=-1, adj=0, padj=1)
@@ -372,7 +377,7 @@ plotReachAftereffects <- function(target='inline') {
     
     X <- rep(groupno-.2,length(RAE))
     Y <- as.numeric(RAE)
-    points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+    points(x=X,y=Y,pch=16,cex=styles$pointsize[1],col=as.character(styles$color_trans[groupno]))
     
     meandist <- getConfidenceInterval(data=c(RAE), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
     
@@ -388,7 +393,7 @@ plotReachAftereffects <- function(target='inline') {
     
     lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
     #print(meandist$CI95)
-    points(x=Xoffset,y=mean(c(RAE)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+    points(x=Xoffset,y=mean(c(RAE)),pch=16,cex=styles$pointsize[1],col=as.character(styles$color_solid[groupno]))
     
     
   }
@@ -396,9 +401,12 @@ plotReachAftereffects <- function(target='inline') {
   axis(side=1, at=c(1,2),labels=styles$label)
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
   
+  ################## SMALLER Y-limits
+  ylims=c(-.1,(2/3))*max(styles$rotation)
+  
   
   plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='group',ylab='individual reach precision, SD [°]', main='aligned',font.main=1)
+       xaxt='n',yaxt='n',xlab='group',ylab='reach precision, SD [°]', main='aligned',font.main=1.2)
   
   #mtext('C', side=2, outer=TRUE, at=c(0,0.5), line=-1, adj=1, padj=0, las=1)
   mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -421,7 +429,7 @@ plotReachAftereffects <- function(target='inline') {
       #print(str(nocursors))
       X <- rep(groupno-.2,length(nocursors))
       Y <- as.numeric(nocursors)
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=styles$pointsize[1],col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
@@ -437,18 +445,18 @@ plotReachAftereffects <- function(target='inline') {
       
       lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
       #print(meandist$CI95)
-      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=styles$pointsize[1],col=as.character(styles$color_solid[groupno]))
       
     }
     
   }
   
   axis(side=1, at=c(1,2),labels=styles$label)
-  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  axis(side=2, at=c(0,10,20),labels=c('0','10','20'),cex.axis=1.00)
   
   
   plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='group',ylab='individual reach precision, SD [°]', main='rotated',font.main=1)
+       xaxt='n',yaxt='n',xlab='group',ylab='reach precision, SD [°]', main='rotated',font.main=1)
   
   #mtext('C', side=2, outer=TRUE, at=c(0,0.5), line=-1, adj=1, padj=0, las=1)
   mtext('D', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -471,7 +479,7 @@ plotReachAftereffects <- function(target='inline') {
       #print(str(nocursors))
       X <- rep(groupno-.2,length(nocursors))
       Y <- as.numeric(nocursors)
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=styles$pointsize[1],col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=c(nocursors), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
@@ -487,14 +495,14 @@ plotReachAftereffects <- function(target='inline') {
       
       lines(x=rep(Xoffset,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
       #print(meandist$CI95)
-      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      points(x=Xoffset,y=mean(c(nocursors)),pch=16,cex=styles$pointsize[1],col=as.character(styles$color_solid[groupno]))
       
     }
     
   }
   
   axis(side=1, at=c(1,2),labels=styles$label)
-  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  axis(side=2, at=c(0,10,20),labels=c('0','10','20'),cex.axis=1.00)
   
   
   

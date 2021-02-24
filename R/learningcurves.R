@@ -391,8 +391,11 @@ plotLearningCurves <- function(target='inline') {
   
   styles <- getStyle()
   
+  fw <- styles$figwidth[1]
+  fh <- fw * (2/3)
+  
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig3.svg', width=7.5, height=5.5, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig3.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
@@ -481,7 +484,7 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel C: individual participants in the first trial set
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,6.5),ylim=ylims,xlab='trial set',ylab='individual reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(1,6),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,6.5),ylim=ylims,xlab='trial set',ylab='individual reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
   #mtext('C', side=3, outer=TRUE, at=c(5/7,1), line=-1, adj=0, padj=1)
   mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -499,7 +502,7 @@ plotLearningCurves <- function(target='inline') {
       X <- rep((groupno-(1/3)+((blockno-1)*2)),dim(blocked)[1])
       Y <- c(blocked[,blockno])
       #print(Y)
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=styles$pointsize[1],col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=c(blocked[,blockno]), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
@@ -513,7 +516,7 @@ plotLearningCurves <- function(target='inline') {
       
       lines(x=rep(groupno+((blockno-1)*2),2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
       #print(meandist$CI95)
-      points(x=groupno+((blockno-1)*2),y=mean(c(blocked[,blockno])),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      points(x=groupno+((blockno-1)*2),y=mean(c(blocked[,blockno])),pch=16,cex=styles$pointsize[1],col=as.character(styles$color_solid[groupno]))
       
     }
   }
@@ -546,7 +549,7 @@ plotLearningCurves <- function(target='inline') {
       X <- rep((groupno-(1/3)+((conditionno-1)*2)),dim(reachprecision)[1])
       Y <- c(reachprecision[,condition])
       
-      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=styles$pointsize[1],col=as.character(styles$color_trans[groupno]))
       
       meandist <- getConfidenceInterval(data=Y, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
       
@@ -559,7 +562,7 @@ plotLearningCurves <- function(target='inline') {
       polygon(x=DY+groupno+((conditionno-1)*2), y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
       
       lines(x=rep(groupno+((conditionno-1)*2),2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
-      points(x=groupno+((conditionno-1)*2),y=mean(Y),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+      points(x=groupno+((conditionno-1)*2),y=mean(Y),pch=16,cex=styles$pointsize[1],col=as.character(styles$color_solid[groupno]))
       
     }
     

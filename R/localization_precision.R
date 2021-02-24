@@ -366,10 +366,11 @@ plotBeightonLocSTD <- function(target='inline') {
   plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization SD [°]',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
   
   myLinReg <- lm(std ~ Beighton, data=locSTD)
+  
   Xh <- seq(0,9,.01)
   LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
   
-  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#DDDDDD', border=NA)
+  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#E9E9E9', border=NA)
   
   lines(x=Xh,y=LRfit[,'fit'], col='#000000')
   
@@ -385,9 +386,13 @@ plotBeightonLocSTD <- function(target='inline') {
     
   }
   
-  labels <- c(as.character(styles$label), 'linear regression')
-  colors <- c(as.character(styles$color_solid), '#000000')
-  legend(0, 16, labels, col=colors, bty='n', cex=0.85, lw=1, seg.len = 1)
+  labels <- c(as.character(styles$label))
+  colors <- c(as.character(styles$color_solid))
+  legend(0, 16, labels, col=colors, bty='n', cex=1, pch=c(1,1))
+  
+  labels <- c('regression')
+  colors <- c('#000000')
+  legend(4.5, 16, labels, col=colors, bty='n', cex=1, lw=c(1), seg.len = c(1), pch=c(NA))
   
   axis(1,seq(0,9,3))
   axis(2,seq(0,15,5))
@@ -448,7 +453,10 @@ correlateBeightonLocSTD <- function() {
   locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
   locSTD$std <- sqrt(locSTD$variance)
     
-  print(cor.test(locSTD$std, locSTD$Beighton))
+  #print(cor.test(locSTD$std, locSTD$Beighton))
+  
+  print(summary(lm(std ~ Beighton, data=locSTD)))
+  
   
 }
 

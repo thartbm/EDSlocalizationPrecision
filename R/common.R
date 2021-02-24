@@ -18,7 +18,7 @@ getGroupParticipants <- function(group) {
 getStyle <- function() {
   
   
-  # This is for plots for aging:
+  # Set styles for the two groups (colors, labels, max rotation)
   groups    =  c('sEDS', 
                  'zEDS')
   rotations =  c(30,
@@ -34,9 +34,14 @@ getStyle <- function() {
   labels <-    c('control',
                  'EDS')
   
+  # these are not really different for the groups:
+  figwidth <- c(6.5,6.5)
+  pointsize <- c(1, 0.83) # the second one is used in fig 5
+  fontsize  <- c(1,1)
   
-  styles <- data.frame(groups,rotations,solidcolors,transcolors,linestyles,labels)
-  colnames(styles) <- c('group','rotation','color_solid','color_trans','linestyle','label')
+  
+  styles <- data.frame(groups,rotations,solidcolors,transcolors,linestyles,labels,figwidth,fontsize,pointsize)
+  colnames(styles) <- c('group','rotation','color_solid','color_trans','linestyle','label','figwidth','fontsize','pointsize')
   
   return(styles)
   
