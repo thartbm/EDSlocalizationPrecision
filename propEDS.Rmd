@@ -11,27 +11,9 @@ output:
     df_print: paged
 ---
 
+# Overview
 
-    • Aligned proprioceptive localization and reaching results.
-    
-    Figure 1a – baseline bias, still need; 
-    Figure 1B is B on page 12 of R report (propEDS.docx) and is standard deviations of aligned localization. 
-    Figure 1C is reach training endpoint errors. Is this the aligned data points in Figure B on page 5 of R report?; 
-    Figure 1D – is the standard deviations of the training reach endpoint errors. I don’t think we have this.)
-    
-    • Learning curve results (I think maybe we chose to not include this since we have the aligned vs rotated aftereffect results in the next figure) (Figure 2 - Mention if there is difference in baseline cursor reaches; show without bootstrapped x. I don’t think we have this figure yet.)
-    
-    • Aftereffects results (Fig 3; use only without strategy rotated. We have Figure B on page 5 of the R report, but would have to delete “include” data points. I think we should include aligned results to show that they learned.)
-    
-    • Prop recal results (Figure 4; do we want all panels of figure on page 7 of R report?)
-    
-    • Prop/hypermobility correlation results (Figure 5 – figure on page 19 of R report)
-    
-
-
-# Introduction
-
-In this study we want to replicate that people with Ehlers-Danlos Syndrome (EDS) have lower proprioceptive precision than age-matched controls [Clayton et al., XXXX]. We do this with a different method than before, which allows comparing proprioception with predicted sensory consequences. We also have Beighton scores for all participants so that we can see if hypermobility is correlated to proprioceptive precision. The paradigm is exactly the same as in a previous study [Modchalingam et al., 2019] from which we used the non-instructed variant with a rotation of 30 degrees. This could be used as a reference.
+In this study we want to replicate that people with Ehlers-Danlos Syndrome (EDS) have lower proprioceptive precision than age-matched controls (Clayton et al., 2013; 2015). We do this with a different method than before, which allows comparing proprioception with predicted sensory consequences. However, this seems to make no difference, so in the paper this is stressed. We also have Beighton scores for all participants so that we can see if hypermobility is correlated to proprioceptive precision. The paradigm is exactly the same as in a previous study (Modchalingam et al., 2019) from which we used the non-instructed variant with a rotation of 30 degrees.
 
 The main hypothesis is that in people with EDS, the proprioceptive signals are less reliable, so that precision of proprioceptive hand localization (without any other feedback) will also be less reliable.
 
@@ -70,6 +52,7 @@ We still need data. For this notebook, we can simply download pre-processed data
 ```{r}
 
 usePreprocessed <- TRUE
+# set this to false to download raw data and redo all the processing on your own computer:
 #usePreprocessed <- FALSE
 
 if (usePreprocessed) {
@@ -118,30 +101,14 @@ if (usePreprocessed) {
 
 Now that both code and data are available, we can start.
 
-_Planned Figures_
+## Figures
 
-For the Methods:
-
-1. Setup & Trial types
-2. Task order
-
-For the Results:
-
-3. Baseline proprioceptive accuracy & precision
-4. Aligned reaching
-5. Learning curves
-6. No-cursor data
-7. Recalibrated proprioceptive accuracy & precision
-8. Beighton scores over proprioceptive precision
-
-_Current Figures_
-
-For the Methods:
+For the Methods (these are given as svg/pdf files):
 
 1. Setup & Trial types
 2. Task order
 
-For the Results:
+For the Results (these are created by functions based on the data):
 
 3. Reach training, with aligned and rotated reach precision
 4. Implicit no-cursor changes, with aligned and rotated open-loop reach precision
@@ -151,7 +118,7 @@ For the Results:
 - 3 & 4 show no difference between EDS and controls
 - 5 does show an effect on precision (which can't be explained by closed/open-loop baseline, changes or precision: see 3+4)
 - 6 and this correlates with severity of symptoms
-
+  
 # Proprioceptive accuracy and precision
 
 > _Our main question is on the proprioceptive accuracy and precision in people with EDS compared to controls. However, before we able to investigate this with our data, we need to rule out a few alternative explanations. First, do people with EDS reach differently to begin with, or adapt in a different way compared to controls. Second, is the implicit motor adaptation in people with EDS different from controls?_
@@ -257,7 +224,7 @@ This mostly confirms what the figure shows: effects of training on localization,
 
 ## Localization precision
 
-Now the interesting part. We've mostly not seen any differences between the two groups which is what we expected. The exception is the _with strategy_ reach aftereffects, but for the current study, the more important issue is that there were no group effects on any of the localization measures. The question is if using this fast method of assessing proprioceptive recalibration we find the same effect as earlier (Clayton et al., XXXX) [@Clayton1234]: that people with EDS have larger/smaller proprioceptive precision. (The wider confidence interval in the group of people with EDS in the difference between active and passive localization shifts may be due to differences between individuals localization shifts, but not their proprioceptive hand localization precision.)
+Now the interesting part. We've mostly not seen any differences between the two groups which is what we expected. The exception is the _with strategy_ reach aftereffects, but for the current study, the more important issue is that there were no group effects on any of the localization measures. The question is if using this fast method of assessing proprioceptive recalibration we find the same effect as earlier (Clayton et al., 2013; 2015): that people with EDS have larger/smaller proprioceptive precision. (The wider confidence interval in the group of people with EDS in the difference between active and passive localization shifts may be due to differences between individuals localization shifts, but not their proprioceptive hand localization precision.)
 
 After subtracting a smoothed spline fit to each individual participants localization errors across hand angles, in each of the 4 conditions, which should factor out individual levels of accuracy, we are then left with the precision of their responses in all 4 conditions. Of those we take the variance, but for frequentist stats, it is more useful to use the standard deviation (as it gets the data more or less normally distributed), so we convert the variance to standard deviation before doing statistics.
 
@@ -313,7 +280,7 @@ We can explore one issue with such a test: it would be best if it were cheap / e
 localizationSTDlogreg()
 ```
 
-Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting. This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull predictor of EDS.
+Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting (aligned active). This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull _clinical_ predictor of EDS.
 
 # Summary
 
@@ -338,7 +305,6 @@ This chunk of code merely stores all the figures as SVG files in the `doc/` fold
 plotLearningCurves(target='svg')
 plotReachAftereffects(target='svg')
 plotLocalizationShifts(target='svg')
-#plotLocalizationVariance(target='svg')
 plotBeightonLocSTD(target='svg')
 ```
 
