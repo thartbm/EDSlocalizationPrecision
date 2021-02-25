@@ -894,7 +894,7 @@ localizationAOV <- function(groups=c('sEDS','zEDS')) {
   # full ANOVA:
   print('*** full ANOVA')
 #  print(ezANOVA(data=df,dv=bias_deg,wid=subject,within=c(rotated,passive,angle),between=group,type=3))
-  print(ezANOVA(data=dfs,dv=bias_deg,wid=subject,within=c(rotated,passive),between=group,type=3))
+  print(ez::ezANOVA(data=dfs,dv=bias_deg,wid=subject,within=c(rotated,passive),between=group,type=3))
   
   # ANOVA on change in localization:
   # for (passive in c(0,1)) {
@@ -953,7 +953,7 @@ localizationAOV <- function(groups=c('sEDS','zEDS')) {
   
   # ANOVA on localization shifts
   print('*** localization shifts')
-  print(ezANOVA(data=dfd,dv=bias_deg,wid=subject,between=group,within=passive,type=3))
+  print(ez::ezANOVA(data=dfd,dv=bias_deg,wid=subject,between=group,within=passive,type=3))
   
   
 }
