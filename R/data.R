@@ -1,88 +1,77 @@
 
-getPreprocessedData <- function(check=TRUE,participantsOnly=FALSE) {
+
+downloadOSFdata <- function(demographics=TRUE, overwrite=TRUE, removezip=TRUE, getprocessed=TRUE, getraw=FALSE) {
   
-  cat('Making sure pre-processed data is available locally:\n')
+  # if (overwrite) {
+  #   conflicts = 'overwrite'
+  # } else {
+  #   conflicts = 'skip'
+  # }
   
-  data_files <- c('participants.csv'          = 'https://osf.io/6xpag/download',
-                  'participants_files.csv'    = 'https://osf.io/xs6g5/download',
-                  'all_localization_var.csv'  = 'https://osf.io/nrfq5/download',
-                  
-                  'sEDS_curves.csv'           = 'https://osf.io/tv46u/download',
-                  'sEDS_loc_AOV.csv'          = 'https://osf.io/3bxnh/download',
-                  'sEDS_localization.csv'     = 'https://osf.io/6u9zg/download',
-                  'sEDS_localization_tCI.csv' = 'https://osf.io/qzyut/download',
-                  'sEDS_localization_var.csv' = 'https://osf.io/skv7u/download',
-                  'sEDS_nocursors.csv'        = 'https://osf.io/shk29/download',
-                  'sEDS_nocursor_var.csv'     = 'https://osf.io/q57nw/download',
-                  'sEDS_training_var.csv'     = 'https://osf.io/t7c3u/download',
-                  'sEDS_localizationbias.csv' = 'https://osf.io/vzqc6/download',
-                  
-                  'zEDS_curves.csv'           = 'https://osf.io/tbj6s/download',
-                  'zEDS_loc_AOV.csv'          = 'https://osf.io/4rcdt/download',
-                  'zEDS_localization.csv'     = 'https://osf.io/er97w/download',
-                  'zEDS_localization_tCI.csv' = 'https://osf.io/muygq/download',
-                  'zEDS_localization_var.csv' = 'https://osf.io/9tcp8/download',
-                  'zEDS_nocursors.csv'        = 'https://osf.io/wgnfq/download',
-                  'zEDS_nocursor_var.csv'     = 'https://osf.io/frcax/download',
-                  'zEDS_training_var.csv'     = 'https://osf.io/ehtsy/download',
-                  'zEDS_localizationbias.csv' = 'https://osf.io/j3ce8/download'
+  filenames <- c()
+  
+  if (getraw) {
+    filenames <- c(filenames, 'rawdata.zip')
+  }
+  
+  if (getprocessed) {
     
-  )
-  
-  if (participantsOnly) {
-    
-    data_files <- c('participants.csv'          = 'https://osf.io/6xpag/download',
-                    'participants_files.csv'    = 'https://osf.io/xs6g5/download')
+    filenames <- c(filenames, 'processed.zip')
     
   }
   
-  for (filename in names(data_files)) {
+  if (demographics) {
+    filenames <- c(filenames, c('participants.csv', 'participants_files.csv'))
+  }
+  
+  OSFnode <- osfr::osf_retrieve_node("t2jrs")
+  
+  # get a list of files for the year and semester that is requested:
+  files <- osfr::osf_ls_files(OSFnode, path='data/', n_max=30)
+  
+  for (filename in filenames) {
     
-    folderfilename <- sprintf('data/%s',filename)
+    cat(sprintf('making sure we have: %s\n',filename))
     
-    if (!check | !file.exists(folderfilename)) {
+    # find which line corresponds to the file:
+    idx <- which(files$name == filename)
+    
+    # check that the file exists on OSF, and is unique:
+    # if not: skip to next file
+    if (length(idx) != 1) {
+      next
+    }
+    
+    # download the file:
+    if (!file.exists(sprintf('data/%s',files$name[idx])) | overwrite) {
+      osfr::osf_download(x = files[idx,], 
+                         path = sprintf('data/%s', filename), 
+                         overwrite = overwrite)
+    }
+    
+    # check if it is a zip file:
+    if (grepl('\\.zip$', filename)) {
       
-      url = as.character(data_files[filename])
+      # then unzip it there:
+      unzip(sprintf('data/%s',filename), exdir='data/')
       
-      cat(sprintf("Downloading: '%s' from '%s'\n", filename, url))
-      
-      df <- read.csv(url(url),stringsAsFactors=FALSE)
-      
-      write.csv(df,folderfilename,row.names=FALSE,quote=FALSE)
-      
-    } else {
-      
-      cat(sprintf("File exists: '%s', not downloading.\n", filename))
+    }
+    
+  }
+  
+  if (removezip) {
+    
+    for (filename in filenames) {
+    
+      # check if it is a zip file:
+      if (grepl('\\.zip$', filename)) {
+        
+        # and remove the zip file, if that is wanted:
+        file.remove(sprintf('data/%s',filename))
+      }
       
     }
     
   }
   
 }
-
-getRawData <- function(check=TRUE) {
- 
-  folderfilename <- 'data/rawdata.zip'
-  
-  if (!check | !file.exists(folderfilename)) {
-    
-    url = as.character('https://osf.io/2p5bh/download')
-    
-    cat(sprintf("Downloading: 'rawdata.zip' from '%s'\n", url))
-    
-    download.file(url = url, 
-                  destfile = folderfilename, 
-                  method = 'auto', 
-                  quiet = FALSE, 
-                  mode = "wb")
-    
-  } else {
-    
-    cat('"rawdata.zip" already present.\n')
-    
-  }
-  
-  unzip(zipfile = 'data/rawdata.zip', exdir = 'data/')
-  
-}
-

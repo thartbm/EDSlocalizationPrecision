@@ -25,15 +25,9 @@ Nevertheless, we will also analyze the data from the reach training session, to 
 
 # Setting up the R environment
 
-We recommend running the code in the R markdown notebook using R Studio, but it should be possible to run the functions from the R source files in a straightforward installation of R as well.
+The GitHub repository uses `renv` so that if you opened the RStudio project, it has (only locally in the project) installed the versions of packages used when preparing the code. This means everything *should* run as we intended.
 
-Packages we want:
-```{r}
-library('ez')
-library('svglite')
-```
-
-We've kept the dependencies to a minimum. If either of the two packages is not available on your system, you can install them with this command: `install.packages(c('ez','svglite'))`.
+We recommend running the code in this R markdown notebook using R Studio, but it should be possible to run the functions from the R source files in a regular R shell as well.
 
 There is some code we wrote to do all the pre-processing, create figures and do analyses. Importing the sources below will not do much by itself, as the files only contain functions we defined.
 ```{r}
@@ -58,17 +52,12 @@ usePreprocessed <- TRUE
 if (usePreprocessed) {
   
   # we make sure the files are downloaded from OSF and unzipped:
-  getPreprocessedData()
+  downloadOSFdata()
   
 } else {
   
-  # we still need to download the raw data from OSF:
-  getPreprocessedData(participantsOnly=TRUE)
-  
-  # and then we run a bunch of function to get out the interesting bits:
-  
-  # This function is from data.R and downloads and unzips a zip file with the raw data:
-  getRawData()
+  # make sure to get the raw data, but not the processed data: 
+  downloadOSFdata(getprocessed = F, getraw = T)
   
   # These functions are from learningcurves.R and 
   # 1) create the pre-processed learning-curve files:
