@@ -16,7 +16,7 @@
    version="1.1"
    id="svg14167"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="Vachon_Fig1.svg">
+   sodipodi:docname="Fig1.svg">
   <defs
      id="defs14161">
     <clipPath
@@ -1043,15 +1043,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.1999931"
-     inkscape:cx="936.03107"
-     inkscape:cy="447.823"
+     inkscape:cx="551.44553"
+     inkscape:cy="212.82165"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1600"
-     inkscape:window-height="1137"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1920"
+     inkscape:window-height="1021"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -1673,7 +1673,7 @@
        width="180.92259" />
     <g
        id="g1328"
-       transform="matrix(0.48522067,0,0,0.48522067,-14.765675,139.35032)">
+       transform="matrix(0.48522067,0,0,0.48522067,-14.765658,67.56275)">
       <image
          style="opacity:0.9"
          width="187.64357"
@@ -1716,7 +1716,8 @@
          y="141.11479"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.69999981px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';stroke-width:0.26458332px">A</tspan></text>
     <g
-       id="g1249">
+       id="g1210"
+       transform="translate(1.723877e-5,71.787582)">
       <image
          style="opacity:0.9"
          width="91.048538"
@@ -1733,7 +1734,7 @@
          id="path25546" />
       <path
          inkscape:connector-curvature="0"
-         style="fill:#ffd800;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.46;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="fill:#ffd800;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.46000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m 40.483467,155.71422 c 1.07703,0 1.952916,0.87589 1.952916,1.95292 0,1.74337 -2.103791,2.61506 -3.335892,1.38297 -1.232087,-1.2321 -0.360398,-3.33589 1.382976,-3.33589 z m 0,0"
          id="path25548" />
       <path
@@ -1776,18 +1777,18 @@
          style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.22985201;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1"
          d="m 20.816211,155.71422 c 1.07703,0 1.952915,0.87589 1.952915,1.95292 0,1.74337 -2.103789,2.61506 -3.335889,1.38297 -1.232089,-1.2321 -0.3604,-3.33589 1.382974,-3.33589 z m 0,0"
          id="path25548-4" />
-      <text
-         id="text1353-0"
-         y="143.76059"
-         x="-24.722075"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05555534px;line-height:125%;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.69999981px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';fill:#ffffff;fill-opacity:1;stroke-width:0.26458332px"
-           y="143.76059"
-           x="-24.722075"
-           id="tspan1351-5"
-           sodipodi:role="line">B</tspan></text>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05555534px;line-height:125%;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="-24.722075"
+       y="143.76059"
+       id="text1353-0"><tspan
+         sodipodi:role="line"
+         id="tspan1351-5"
+         x="-24.722075"
+         y="143.76059"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.69999981px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';fill:#ffffff;fill-opacity:1;stroke-width:0.26458332px">B</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05555534px;line-height:125%;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
