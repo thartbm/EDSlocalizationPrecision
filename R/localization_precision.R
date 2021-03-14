@@ -359,9 +359,16 @@ plotBeightonLocSTD <- function(target='inline') {
   locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
   locSTD$std <- sqrt(locSTD$variance)
   
+  fw<-4
+  fh<-4
+  
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig6.svg', width=4, height=4, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig6.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
+  if (target == 'tiff') {
+    tiff(filename='doc/Fig6.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
+  }
+  
   
   plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization SD [°]',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
   
@@ -397,7 +404,7 @@ plotBeightonLocSTD <- function(target='inline') {
   axis(1,seq(0,9,3))
   axis(2,seq(0,15,5))
   
-  if (target == 'svg') {
+  if (target %in% c('tiff','svg')) {
     dev.off()
   }
   

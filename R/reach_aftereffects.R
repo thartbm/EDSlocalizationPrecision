@@ -263,6 +263,9 @@ plotReachAftereffects <- function(target='inline') {
   if (target == 'svg') {
     svglite::svglite(file='doc/Fig4.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
+  if (target == 'tiff') {
+    tiff(filename='doc/Fig4.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
+  }
   
   
   #par(mfrow=c(1,1), mar=c(4,4,2,0.1))
@@ -507,7 +510,7 @@ plotReachAftereffects <- function(target='inline') {
   
   
   
-  if (target == 'svg') {
+  if (target %in% c('svg','tiff')) {
     dev.off()
   }
   

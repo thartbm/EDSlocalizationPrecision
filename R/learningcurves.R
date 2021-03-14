@@ -397,6 +397,9 @@ plotLearningCurves <- function(target='inline') {
   if (target == 'svg') {
     svglite::svglite(file='doc/Fig3.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
+  if (target == 'tiff') {
+    tiff(filename='doc/Fig3.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
+  }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
   par(mar=c(4,4,2,0.1))
@@ -572,7 +575,7 @@ plotLearningCurves <- function(target='inline') {
   axis(side=2, at=c(0,10,20),cex.axis=1.00)
   
   
-  if (target == 'svg') {
+  if (target %in% c('svg','tiff')) {
     dev.off()
   }
   
