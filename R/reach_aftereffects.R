@@ -266,6 +266,9 @@ plotReachAftereffects <- function(target='inline') {
   if (target == 'tiff') {
     tiff(filename='doc/Fig4.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
   }
+  if (target == 'pdf') {
+    pdf(file='doc/Fig4.pdf',width=fw,height=fh)
+  }
   
   
   #par(mfrow=c(1,1), mar=c(4,4,2,0.1))
@@ -510,7 +513,7 @@ plotReachAftereffects <- function(target='inline') {
   
   
   
-  if (target %in% c('svg','tiff')) {
+  if (target %in% c('svg','tiff','pdf')) {
     dev.off()
   }
   

@@ -400,6 +400,9 @@ plotLearningCurves <- function(target='inline') {
   if (target == 'tiff') {
     tiff(filename='doc/Fig3.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
   }
+  if (target == 'pdf') {
+    pdf(file='doc/Fig3.pdf',width=fw,height=fh)
+  }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
   par(mar=c(4,4,2,0.1))
@@ -575,7 +578,7 @@ plotLearningCurves <- function(target='inline') {
   axis(side=2, at=c(0,10,20),cex.axis=1.00)
   
   
-  if (target %in% c('svg','tiff')) {
+  if (target %in% c('svg','tiff','pdf')) {
     dev.off()
   }
   

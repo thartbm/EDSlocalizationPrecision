@@ -441,6 +441,9 @@ plotLocalizationShifts <- function(target='inline') {
   if (target == 'tiff') {
     tiff(filename='doc/Fig5.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
   }
+  if (target == 'pdf') {
+    pdf(file='doc/Fig5.pdf',width=fw,height=fh)
+  }
   
   
   #par(mar=c(4,4,2,0.1))
@@ -849,7 +852,7 @@ plotLocalizationShifts <- function(target='inline') {
   
   axis(side=1, at=c(1.5,3.5), labels=c('active','passive'))
   
-  if (target %in% c('tiff','svg')) {
+  if (target %in% c('tiff','svg','pdf')) {
     dev.off()
   }
   

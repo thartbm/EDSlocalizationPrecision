@@ -368,6 +368,10 @@ plotBeightonLocSTD <- function(target='inline') {
   if (target == 'tiff') {
     tiff(filename='doc/Fig6.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
   }
+  if (target == 'pdf') {
+    pdf(file='doc/Fig3.pdf',width=fw,height=fh)
+  }
+  
   
   
   plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization SD [°]',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
@@ -404,7 +408,7 @@ plotBeightonLocSTD <- function(target='inline') {
   axis(1,seq(0,9,3))
   axis(2,seq(0,15,5))
   
-  if (target %in% c('tiff','svg')) {
+  if (target %in% c('tiff','svg','pdf')) {
     dev.off()
   }
   
