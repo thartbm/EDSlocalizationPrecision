@@ -6,7 +6,6 @@ author:
 - Denise Y.P. Henriques
 output:
   word_document: default
-  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -291,9 +290,13 @@ This rules out many alternative explanations for the interesting findings:
 This chunk of code merely stores all the figures as SVG files in the `doc/` folder of the project:
 
 ```{r}
-plotLearningCurves(target='svg')
-plotReachAftereffects(target='svg')
-plotLocalizationShifts(target='svg')
-plotBeightonLocSTD(target='svg')
+target <- 'svg' # one of: 'svg', 'pdf', or 'tiff'
+
+rePlotMethodsFigX(target=target, fig=1)
+rePlotMethodsFigX(target=target, fig=2)
+plotLearningCurves(target=target)
+plotReachAftereffects(target=target)
+plotLocalizationShifts(target=target)
+plotBeightonLocSTD(target=target)
 ```
 
