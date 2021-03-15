@@ -149,6 +149,13 @@
       "Repository": "CRAN",
       "Hash": "fcff9126a4928a96c94e3df85b024899"
     },
+    "crul": {
+      "Package": "crul",
+      "Version": "0.7.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7aa2e51f61e8663697d953c7bf680429"
+    },
     "curl": {
       "Package": "curl",
       "Version": "4.2",
@@ -212,6 +219,13 @@
       "Repository": "CRAN",
       "Hash": "74acef15af489322725cf8233e6dd943"
     },
+    "fs": {
+      "Package": "fs",
+      "Version": "1.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0e26be4558dbbc713d7cfe4a4c361f38"
+    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.3.3",
@@ -261,6 +275,13 @@
       "Repository": "CRAN",
       "Hash": "2d7691222f82f41e93f6d30f169bd5e1"
     },
+    "httpcode": {
+      "Package": "httpcode",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "221d12f5ee446b4d6691f52f081c8740"
+    },
     "isoband": {
       "Package": "isoband",
       "Version": "0.2.3",
@@ -309,6 +330,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "951b57d6afd25bebada4efee4f4c3478"
+    },
+    "magick": {
+      "Package": "magick",
+      "Version": "2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "22fb245a53df228f8857242b6351130b"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -400,6 +428,18 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "7e25ed8dc4f16eada2532a61107d0dc7"
+    },
+    "osfr": {
+      "Package": "osfr",
+      "Version": "0.2.4",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "osfr",
+      "RemoteUsername": "centerforopenscience",
+      "RemoteRef": "master",
+      "RemoteSha": "c0441f9bcf52673d6e55e2b4437ec854b0ecd1d9",
+      "Hash": "abad84b840fc2cefabf360db4167590a"
     },
     "pbkrtest": {
       "Package": "pbkrtest",
@@ -520,6 +560,13 @@
       "Repository": "CRAN",
       "Hash": "edbf4cb1aefae783fd8d3a008ae51943"
     },
+    "rsvg": {
+      "Package": "rsvg",
+      "Version": "1.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "acc8fef238eec5b007088e2cb8a858c9"
+    },
     "scales": {
       "Package": "scales",
       "Version": "1.0.0",
@@ -589,6 +636,20 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9f259855f66a72efd6a49f1689af935b"
+    },
+    "triebeard": {
+      "Package": "triebeard",
+      "Version": "0.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "847a9d113b78baca4a9a8639609ea228"
+    },
+    "urltools": {
+      "Package": "urltools",
+      "Version": "1.7.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e86a704261a105f4703f653e05defa3e"
     },
     "utf8": {
       "Package": "utf8",
