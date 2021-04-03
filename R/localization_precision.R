@@ -363,18 +363,22 @@ plotBeightonLocSTD <- function(target='inline') {
   fh<-4
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig6.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig7.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
   }
   if (target == 'tiff') {
-    tiff(filename='doc/Fig6.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
+    tiff(filename='doc/Fig7.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
   }
   if (target == 'pdf') {
-    pdf(file='doc/Fig3.pdf',width=fw,height=fh)
+    pdf(file='doc/Fig7.pdf',width=fw,height=fh)
   }
   
   
   
-  plot(-1000,-1000,main='localization precision and hypermobility',xlab='Beighton score',ylab='localization SD [°]',xlim=c(-1,10),ylim=c(0,15),bty='n',ax=F,font.main=1)
+  plot(-1000,-1000,
+       main='localization precision and hypermobility',
+       xlab='Beighton score',ylab='localization SD [°]',
+       xlim=c(-1,10),ylim=c(0,10),
+       bty='n',ax=F,font.main=1)
   
   myLinReg <- lm(std ~ Beighton, data=locSTD)
   
@@ -399,14 +403,14 @@ plotBeightonLocSTD <- function(target='inline') {
   
   labels <- c(as.character(styles$label))
   colors <- c(as.character(styles$color_solid))
-  legend(0, 16, labels, col=colors, bty='n', cex=1, pch=c(1,1))
+  legend(0, 3, labels, col=colors, bty='n', cex=1, pch=c(1,1))
   
   labels <- c('regression')
   colors <- c('#000000')
-  legend(4.5, 16, labels, col=colors, bty='n', cex=1, lw=c(1), seg.len = c(1), pch=c(NA))
+  legend(4.5, 3, labels, col=colors, bty='n', cex=1, lw=c(1), seg.len = c(1), pch=c(NA))
   
   axis(1,seq(0,9,3))
-  axis(2,seq(0,15,5))
+  axis(2,seq(0,10,5))
   
   if (target %in% c('tiff','svg','pdf')) {
     dev.off()
