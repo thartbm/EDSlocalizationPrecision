@@ -5,9 +5,10 @@ author:
 - Bernard Marius 't Hart
 - Denise Y.P. Henriques
 output:
-  word_document: default
   html_document:
     df_print: paged
+  pdf_document: default
+  word_document: default
 ---
 
 # Overview
@@ -100,12 +101,14 @@ For the Results (these are created by functions based on the data):
 
 3. Reach training, with aligned and rotated reach precision
 4. Implicit no-cursor changes, with aligned and rotated open-loop reach precision
-5. Localization: baseline biases, shifts, precision
-6. Beighton scores over proprioceptive precision
+5. Localization: baseline biases, shifts
+6. Localization: precision
+7. Beighton scores over proprioceptive precision
 
-- 3 & 4 show no difference between EDS and controls
-- 5 does show an effect on precision (which can't be explained by closed/open-loop baseline, changes or precision: see 3+4)
-- 6 and this correlates with severity of symptoms
+- 3 & 4 show no difference between EDS and controls in learning curves (3) or reach aftereffects (4)
+- 5 shows no difference between EDS and controls in localization bias or shift
+- 6 shows an effect on precision (which can't be explained by closed/open-loop baseline, changes or precision: see 3+4+5)
+- 7 and this correlates with hypermobility
   
 # Proprioceptive accuracy and precision
 
@@ -184,7 +187,7 @@ So now we will look at the measure of interest: hand localization. But before te
 
 First a plot of the shifts in localization responses, induced by rotated training:
 
-```{r fig.width=8, fig.height=8}
+```{r fig.width=8, fig.height=5.7}
 plotLocalizationShifts(target='inline')
 ```
 
@@ -192,7 +195,7 @@ To clarify, all data have the aligned localization responses subtracted, except 
 
 ## Baseline biases
 
-**No analyses done yet.** Looks like there is no difference.
+In the top row, each of the two thicker lines (averages for the groups) are well in the confidence interval for the other group: this means there is no difference all through the workspace.
 
 ## Training induced localization shifts
 
@@ -210,9 +213,15 @@ This mostly confirms what the figure shows: effects of training on localization,
 
 > _There is no difference between the EDS and control group in their localization shifts, so this can not be an alternative explanation for any differences we might find in localization precision._
 
-## Localization precision
+# Localization precision
 
 Now the interesting part. We've mostly not seen any differences between the two groups which is what we expected. The exception is the _with strategy_ reach aftereffects, but for the current study, the more important issue is that there were no group effects on any of the localization measures. The question is if using this fast method of assessing proprioceptive recalibration we find the same effect as earlier (Clayton et al., 2013; 2015): that people with EDS have larger/smaller proprioceptive precision. (The wider confidence interval in the group of people with EDS in the difference between active and passive localization shifts may be due to differences between individuals localization shifts, but not their proprioceptive hand localization precision.)
+
+We start with plotting and looking at the precision data:
+
+```{r fig.width=8, fig.height=2.85}
+plotLocalizationPrecision(target='inline')
+```
 
 After subtracting a smoothed spline fit to each individual participants localization errors across hand angles, in each of the 4 conditions, which should factor out individual levels of accuracy, we are then left with the precision of their responses in all 4 conditions. Of those we take the variance, but for frequentist stats, it is more useful to use the standard deviation (as it gets the data more or less normally distributed), so we convert the variance to standard deviation before doing statistics.
 
@@ -297,6 +306,7 @@ rePlotMethodsFigX(target=target, fig=2)
 plotLearningCurves(target=target)
 plotReachAftereffects(target=target)
 plotLocalizationShifts(target=target)
+plotLocalizationPrecision(target=target)
 plotBeightonLocSTD(target=target)
 ```
 
