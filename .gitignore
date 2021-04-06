@@ -26,3 +26,5 @@ vignettes/*.pdf
 rsconnect/
 *.html
 *.docx
+Notebook_html.pdf
+Notebook_docx.pdf
