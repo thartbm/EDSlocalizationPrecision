@@ -116,7 +116,7 @@ For the Results (these are created by functions based on the data):
 
 # Adaptation in people with EDS and Controls
 
-First, we look at the adaptation to the 30 degree rotation, to see if the two groups adapt an equally amount and equally fast.
+First, we look at the adaptation to the 30 degree rotation, to see if the two groups adapt an equal amount and equally fast.
 
 Plot learning curves:
 ```{r fig.width=8, fig.height=6}
