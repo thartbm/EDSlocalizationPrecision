@@ -870,11 +870,14 @@ plotLocalizationShifts <- function(target='inline') {
   fs <- styles$fontsize[1]
   fs <- 0.85
   
+  
+  # 40000000 pixles in total only...
+  
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig5.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig5.svg', width=fw, height=fh, scaling=1, fix_text_size = FALSE)
   }
   if (target == 'tiff') {
-    tiff(filename='doc/Fig5.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
+    tiff(filename='doc/Fig5.tiff',width=fw*1150,height=fh*1150,units='px',type='cairo',compression='lzw',res=1200)
   }
   if (target == 'pdf') {
     pdf(file='doc/Fig5.pdf',width=fw,height=fh)
@@ -1047,7 +1050,7 @@ plotLocalizationPrecision <- function(target='inline') {
   fs <- 0.85
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig6.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig6.svg', width=fw, height=fh, scaling=1, fix_text_size = FALSE)
   }
   if (target == 'tiff') {
     tiff(filename='doc/Fig6.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
