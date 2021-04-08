@@ -261,7 +261,7 @@ plotReachAftereffects <- function(target='inline') {
   fh <- fw * (2/3)
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig4.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig4.svg', width=fw, height=fh, scaling=1, fix_text_size = FALSE)
   }
   if (target == 'tiff') {
     tiff(filename='doc/Fig4.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)

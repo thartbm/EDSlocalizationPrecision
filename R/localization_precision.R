@@ -363,7 +363,7 @@ plotBeightonLocSTD <- function(target='inline') {
   fh<-4
   
   if (target == 'svg') {
-    svglite::svglite(file='doc/Fig7.svg', width=fw, height=fh, system_fonts=list(sans='Arial'))
+    svglite::svglite(file='doc/Fig7.svg', width=fw, height=fh, scaling=1, fix_text_size = FALSE)
   }
   if (target == 'tiff') {
     tiff(filename='doc/Fig7.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
