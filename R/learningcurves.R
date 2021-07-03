@@ -432,7 +432,7 @@ plotLearningCurves <- function(target='inline') {
   
   # axis(side=1, at=c(1,10,20,30))
   axis(side=1, at=c(1,5,10,25,30,35), labels=c('1','5','10','80','85','90'),cex.axis=1.00)
-  axis(side=2, at=c(0,10,20,30),cex.axis=1.00)
+  axis(side=2, at=c(0,15,30),cex.axis=1.00)
   
   legend(20,15,styles$label,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=1.00,seg.len=3)
   
@@ -459,32 +459,50 @@ plotLearningCurves <- function(target='inline') {
     alllines[groupno,] <- apply(blocked, c(2), mean, na.rm=T)
     
     blockedCI <- apply(blocked, c(2), t.interval)
-    allpolys[groupno,] <- c(blockedCI[1,], rev(blockedCI[2,]))
+    #print(blockedCI)
+    #allpolys[groupno,] <- c(blockedCI[1,], rev(blockedCI[2,]))
+    
+    for (blockno in c(1:length(blockdefs))) {
+      
+      Xoffset <- c(1,2,4)[blockno] + (groupno / 2) - (11/12)
+      Xoffsets <- Xoffset + c(0,.33)
+      
+      polX <- c(Xoffsets, rev(Xoffsets))
+      polY <- c(rep(blockedCI[,blockno],each=2))
+      polygon(polX,polY,col=as.character(styles$color_trans[groupno]),border=NA)
+      
+      lines(x=Xoffsets,
+            y=rep(alllines[groupno,blockno],2),
+            col=as.character(styles$color_solid[groupno]),
+            lty=styles$linestyle[groupno],
+            lw=2)
+      
+    }
     
   }
   
   # first plot all the polygons representing confidence intervals, so those are in the background
   
-  for (groupno in c(1:length(styles$group))) {
-    
-    polX <- c(c(1,2,4),rev(c(1,2,4)))
-    polY <- allpolys[groupno,]
-    polygon(polX,polY,col=as.character(styles$color_trans[groupno]),border=NA)
-    
-  }
+  # for (groupno in c(1:length(styles$group))) {
+  #   
+  #   polX <- c(c(1,2,4),rev(c(1,2,4)))
+  #   polY <- allpolys[groupno,]
+  #   polygon(polX,polY,col=as.character(styles$color_trans[groupno]),border=NA)
+  #   
+  # }
   
   # then plot the lines representing the means, so those are in the foreground
   
-  for (groupno in c(1:length(styles$group))) {
-    
-    lines(c(1,2,4),alllines[groupno,],col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
-    
-  }
+  # for (groupno in c(1:length(styles$group))) {
+  #   
+  #   lines(c(1,2,4),alllines[groupno,],col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
+  #   
+  # }
   
   # legend(2,0.45,styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.7)
   
   axis(side=1, at=c(1,2,4), labels=c('1-3','4-6','76-90'),cex.axis=1.00)
-  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  axis(side=2, at=c(0,15,30),cex.axis=1.00)
   
   
   # # # # # # # # # #
@@ -529,7 +547,7 @@ plotLearningCurves <- function(target='inline') {
   
   
   axis(side=1, at=c(1.5,3.5,5.5),labels=c('1-3','4-6','76-90'),cex.axis=1.00)
-  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  axis(side=2, at=c(0,15,30),cex.axis=1.00)
   
   # # # # # # # # # #
   # panel D: aligned and rotated reach precision
