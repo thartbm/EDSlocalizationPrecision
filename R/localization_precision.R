@@ -359,7 +359,7 @@ plotBeightonLocSTD <- function(target='inline') {
   locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
   locSTD$std <- sqrt(locSTD$variance)
   
-  fw<-4
+  fw<-styles$figwidth[1]
   fh<-4
   
   if (target == 'svg') {
@@ -377,27 +377,75 @@ plotBeightonLocSTD <- function(target='inline') {
   plot(-1000,-1000,
        main='localization precision and hypermobility',
        xlab='Beighton score',ylab='localization SD [°]',
-       xlim=c(-1,10),ylim=c(0,10),
+       xlim=c(-3,12),ylim=c(0,10),
        bty='n',ax=F,font.main=1)
   
   myLinReg <- lm(std ~ Beighton, data=locSTD)
-  
   Xh <- seq(0,9,.01)
   LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
   
-  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#E9E9E9', border=NA)
+  text(-2,10,
+       sprintf('r²=%0.2f',cor(locSTD$Beighton, locSTD$std)^2),
+       col='#b400e4ff' )
   
-  lines(x=Xh,y=LRfit[,'fit'], col='#000000')
+  # orange?
+  #   colors[['orange']]    <- list('s'='#ff8200ff', 't'='#ff82002f')
+  # lighter orange?
+  # '#ffcc66ff'
+  # '#ff9933sf'
+  
+  # pink?
+  # colorset[['onlPasS']] <- '#ff6ec7ff' # pink
+  # colorset[['onlPasT']] <- '#ff6ec72f'
+  
+  # violet?
+  # colorset[['onlPasS']] <- '#8266f4ff' # violet
+  # colorset[['onlPasT']] <- '#8266ff2f'
+  
+  # purple
+  #   colors[['purple']]    <- list('s'='#b400e4ff', 't'='#b400e42f')
+  
+  
+  polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])), col='#b400e42f', border=NA)
+  lines(x=Xh,y=LRfit[,'fit'], col='#b400e4ff', lty=2)
+  
+  
   
   for (group_no in c(1:length(styles$group))) {
     
+    # get group data:
     group <- styles$group[group_no]
-    
     subdf <- locSTD[which(locSTD$folder == group),]
     
-    col <- as.character(styles$color_solid[group_no])
+    # linear regression of localization precision as a function of hypermobility score:
+    myLinReg <- lm(std ~ Beighton, data=subdf)
+    Xh <- seq(min(subdf$Beighton),max(subdf$Beighton),.01)
+    LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
+    polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])),
+            col=as.character(styles$color_trans[group_no]), 
+            border=NA)
+    lines(x=Xh,y=LRfit[,'fit'], col=as.character(styles$color_solid[group_no]))
     
+    # plot individual data points:
+    col <- as.character(styles$color_solid[group_no])
     points(subdf$Beighton, subdf$std, col=col, cex=1, pch=1)
+    
+    # plot group-level of localization: 
+    Xoffset <- ((group_no - 1) * 12) - 1.5
+    Xoffsets <- Xoffset + c(-.5,.5)
+    
+    avg <- mean(subdf$std)
+    CI <- t.interval(subdf$std)
+    # print(CI)
+    polygon(c(Xoffsets, rev(Xoffsets)), y = rep(CI, each=2),
+            col=as.character(styles$color_trans[group_no]),
+            border=NA)
+    lines(x=Xoffsets, y=rep(avg,2), col=col)
+    
+    
+    text((group_no-1)*2,10,
+         sprintf('r²=%0.2f',cor(subdf$Beighton, subdf$std)^2),
+         col=col )
     
   }
   
@@ -405,9 +453,9 @@ plotBeightonLocSTD <- function(target='inline') {
   colors <- c(as.character(styles$color_solid))
   legend(0, 3, labels, col=colors, bty='n', cex=1, pch=c(1,1))
   
-  labels <- c('regression')
-  colors <- c('#000000')
-  legend(4.5, 3, labels, col=colors, bty='n', cex=1, lw=c(1), seg.len = c(1), pch=c(NA))
+  labels <- c('combined regression')
+  colors <- c('#b400e4ff')
+  legend(4.5, 3, labels, col=colors, bty='n', cex=1, lw=c(1), seg.len = c(1), pch=c(NA),lty=2)
   
   axis(1,seq(0,9,3))
   axis(2,seq(0,10,5))
