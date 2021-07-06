@@ -281,7 +281,7 @@ plotReachAftereffects <- function(target='inline') {
   
   ylims=c(-.1,1.1)*max(styles$rotation)
   
-  plot(c(0.8,2.2),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.75,2.25),ylim=ylims,bty='n',
+  plot(c(0.4,2.6),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
        xaxt='n',yaxt='n',xlab='session',ylab='reach deviation [°]',main='no-cursor reaching',font.main=1.2)
   
   #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
@@ -296,43 +296,55 @@ plotReachAftereffects <- function(target='inline') {
     #reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
     #reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
     
-    meanExc <- mean(reachaftereffects$exclusive)
-    meanAli <- mean(reachaftereffects$aligned)
-    #meanInc <- mean(reachaftereffects$inclusive)
+    means <- c( mean(reachaftereffects$aligned),
+                mean(reachaftereffects$exclusive) )
+    CIs <- list( t.interval(reachaftereffects$aligned),
+                 t.interval(reachaftereffects$exclusive) )
     
-    coord.x <- c(1,1,2,2)
-    #coord.y <- c(t.interval(reachaftereffects$exclusive),rev(t.interval(reachaftereffects$inclusive)))
-    coord.y <- c(t.interval(reachaftereffects$aligned),rev(t.interval(reachaftereffects$exclusive)))
-    polygon(coord.x, coord.y, col=as.character(styles$color_trans[groupno]), border=NA)
+    #print(CIs)
+    
+    for (cond_no in c(1,2)) {
+      
+      Xoffset <- cond_no + (groupno / 2) - 0.875
+      Xoffsets <- Xoffset + c(0,.25)
+      
+      Xpol <- c( Xoffsets, rev(Xoffsets) )
+      Ypol <- rep( CIs[[cond_no]], each=2 )
+      
+      polygon(Xpol, Ypol, col=as.character(styles$color_trans[groupno]), border=NA)
+      #polygon(coord.x, coord.y, col=as.character(styles$color_trans[groupno]), border=NA)
+      lines(Xoffsets, rep(means[cond_no], 2), col=as.character(styles$color_solid[groupno]))
+      
+    }
     
   }
   
-  for (groupno in c(1:length(styles$group))) {
-    
-    group <- styles$group[groupno]
-    offset <- (groupno - ((length(styles$group) - 1) / 2)) * .035
-    
-    reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
-    
-    
-    #reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
-    #reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
-    
-    meanAli <- mean(reachaftereffects$aligned)
-    meanExc <- mean(reachaftereffects$exclusive)
-    #meanInc <- mean(reachaftereffects$inclusive)
-    
-    lines(c(1,2),c(meanAli,meanExc),col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
-    
-  }
+  # for (groupno in c(1:length(styles$group))) {
+  #   
+  #   group <- styles$group[groupno]
+  #   offset <- (groupno - ((length(styles$group) - 1) / 2)) * .035
+  #   
+  #   reachaftereffects <- read.csv(sprintf('data/%s_nocursors.csv',group), stringsAsFactors=FALSE)
+  #   
+  #   
+  #   #reachaftereffects$exclusive <- reachaftereffects$exclusive - reachaftereffects$aligned
+  #   #reachaftereffects$inclusive <- reachaftereffects$inclusive - reachaftereffects$aligned
+  #   
+  #   meanAli <- mean(reachaftereffects$aligned)
+  #   meanExc <- mean(reachaftereffects$exclusive)
+  #   #meanInc <- mean(reachaftereffects$inclusive)
+  #   
+  #   lines(c(1,2),c(meanAli,meanExc),col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
+  #   
+  # }
   
   axis(side=1, at=c(1,2), labels=c('aligned','rotated'),cex.axis=1.00)
   if (max(styles$rotation) == 30) {
-    axis(side=2, at=c(0,10,20,30),cex.axis=1.00)
+    axis(side=2, at=c(0,15,30),cex.axis=1.00)
   }
   
   # legend(0.5,max(styles$rotation)*(7/6),styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.85)
-  legend(0.8,30,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
+  legend(0.4,35,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
   
   
   plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
@@ -405,7 +417,7 @@ plotReachAftereffects <- function(target='inline') {
   }
   
   axis(side=1, at=c(1,2),labels=styles$label)
-  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=1.00)
+  axis(side=2, at=c(0,15,30),cex.axis=1.00)
   
   ################## SMALLER Y-limits
   ylims=c(-.1,(2/3))*max(styles$rotation)
