@@ -377,14 +377,14 @@ plotBeightonLocSTD <- function(target='inline') {
   plot(-1000,-1000,
        main='localization precision and hypermobility',
        xlab='Beighton score',ylab='localization SD [°]',
-       xlim=c(-3,12),ylim=c(0,10),
+       xlim=c(-1,13.5),ylim=c(0,10),
        bty='n',ax=F,font.main=1)
   
   myLinReg <- lm(std ~ Beighton, data=locSTD)
   Xh <- seq(0,9,.01)
   LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
   
-  text(-2,10,
+  text(1,10,
        sprintf('r²=%0.2f',cor(locSTD$Beighton, locSTD$std)^2),
        col='#b400e4ff' )
   
@@ -418,20 +418,20 @@ plotBeightonLocSTD <- function(target='inline') {
     subdf <- locSTD[which(locSTD$folder == group),]
     
     # linear regression of localization precision as a function of hypermobility score:
-    myLinReg <- lm(std ~ Beighton, data=subdf)
-    Xh <- seq(min(subdf$Beighton),max(subdf$Beighton),.01)
-    LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
-    polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])),
-            col=as.character(styles$color_trans[group_no]), 
-            border=NA)
-    lines(x=Xh,y=LRfit[,'fit'], col=as.character(styles$color_solid[group_no]))
+    #myLinReg <- lm(std ~ Beighton, data=subdf)
+    #Xh <- seq(min(subdf$Beighton),max(subdf$Beighton),.01)
+    #LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
+    #polygon(c(Xh,rev(Xh)), c(LRfit[,'lwr'], rev(LRfit[,'upr'])),
+    #        col=as.character(styles$color_trans[group_no]), 
+    #        border=NA)
+    #lines(x=Xh,y=LRfit[,'fit'], col=as.character(styles$color_solid[group_no]))
     
     # plot individual data points:
     col <- as.character(styles$color_solid[group_no])
     points(subdf$Beighton, subdf$std, col=col, cex=1, pch=1)
     
     # plot group-level of localization: 
-    Xoffset <- ((group_no - 1) * 12) - 1.5
+    Xoffset <- ((group_no - 1) * 1.5) + 11
     Xoffsets <- Xoffset + c(-.5,.5)
     
     avg <- mean(subdf$std)
@@ -442,10 +442,6 @@ plotBeightonLocSTD <- function(target='inline') {
             border=NA)
     lines(x=Xoffsets, y=rep(avg,2), col=col)
     
-    
-    text((group_no-1)*2,10,
-         sprintf('r²=%0.2f',cor(subdf$Beighton, subdf$std)^2),
-         col=col )
     
   }
   
@@ -515,11 +511,24 @@ correlateBeightonLocSTD <- function() {
   
   locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
   locSTD$std <- sqrt(locSTD$variance)
-    
+  
+  styles <- getStyle()
+  
   #print(cor.test(locSTD$std, locSTD$Beighton))
   
+  cat('OVERALL REGRESSION:\n')
   print(summary(lm(std ~ Beighton, data=locSTD)))
   
+  for (group_no in c(1:length(styles$group))) {
+      
+    # get group data:
+    group <- styles$group[group_no]
+    subdf <- locSTD[which(locSTD$folder == group),]
+    
+    cat(sprintf('REGRESSION FOR %s:\n',c('control','EDS')[group_no]))
+    print(summary(lm(std ~ Beighton, data=subdf)))
+    
+  }
   
 }
 
