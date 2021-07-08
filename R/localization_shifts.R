@@ -1361,6 +1361,11 @@ plotLocalizationPrecision <- function(target='inline') {
     
   }
   
+  # only passive:
+  xpos <- 2 + (c(1,2)/2) - 0.75
+  lines(xpos,rep(9.5,2),col='#999999')
+  text(mean(xpos),10,'*',cex=2,col='#999999')
+  
   axis(side=1,at=c(1,2),labels=c('active','passive'))
   axis(side=2,at=seq(0,12,4))
 
@@ -1420,6 +1425,13 @@ plotLocalizationPrecision <- function(target='inline') {
   #   
   # }
   
+  for (condno in c(1,2)) {
+    
+    xpos <- condno + (c(1,2)/2) - 0.75
+    lines(xpos,rep(9.5,2),col='#999999')
+    text(mean(xpos),10,'*',cex=2,col='#999999')
+    
+  }
   
   axis(side=1,at=c(1,2),labels=c('active','passive'))
   #axis(side=2,at=seq(0,12,4))
