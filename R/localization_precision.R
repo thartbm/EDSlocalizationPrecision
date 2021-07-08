@@ -445,6 +445,10 @@ plotBeightonLocSTD <- function(target='inline') {
     
   }
   
+  xpos <- Xoffset <- ((c(1,2) - 1) * 1.5) + 11
+  lines(xpos, c(9,9), col='#999999')
+  text(mean(xpos),9.5,'*',cex=2,col='#999999')
+  
   labels <- c(as.character(styles$label))
   colors <- c(as.character(styles$color_solid))
   legend(0, 3, labels, col=colors, bty='n', cex=1, pch=c(1,1))
