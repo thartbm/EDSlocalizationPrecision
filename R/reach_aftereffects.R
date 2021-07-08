@@ -317,6 +317,11 @@ plotReachAftereffects <- function(target='inline') {
       
     }
     
+    # group significance line:
+    xpoints <- c(1,2) + (groupno / 2) - 0.75
+    lines(xpoints,rep((groupno*5)+15,2),col='#999999')
+    text(mean(xpoints),(groupno*5)+17.5,'*',cex=2,col='#999999')
+    
   }
   
   # for (groupno in c(1:length(styles$group))) {
@@ -343,8 +348,10 @@ plotReachAftereffects <- function(target='inline') {
     axis(side=2, at=c(0,15,30),cex.axis=1.00)
   }
   
+  # old legend:
   # legend(0.5,max(styles$rotation)*(7/6),styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.85)
-  legend(0.4,35,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
+  # moved legend to panel B:
+  #legend(0.4,35,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
   
   
   plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
@@ -415,6 +422,8 @@ plotReachAftereffects <- function(target='inline') {
     
     
   }
+  
+  legend(0.4,35,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=1.00,seg.len = 3)
   
   axis(side=1, at=c(1,2),labels=styles$label)
   axis(side=2, at=c(0,15,30),cex.axis=1.00)
