@@ -479,6 +479,20 @@ plotLearningCurves <- function(target='inline') {
       
     }
     
+    blockmiddles <- c(0,1,3) + 1
+    blockconnects <- list(c(1,2),c(1,3),c(2,3))
+    for (idx in c(1,2,3)) {
+      
+      blocks <- blockconnects[[idx]]
+      xlocs <- blockmiddles[blocks]
+      yloc  <- 22 + (idx * 4)
+      ylocs <- rep(yloc,2)
+      lines(xlocs,ylocs,col='#999999')
+      text(mean(xlocs),yloc+2,'*',cex=1.5,col='#999999')
+      
+    }
+    
+    
   }
   
   # first plot all the polygons representing confidence intervals, so those are in the background
@@ -620,6 +634,10 @@ learningCurveANOVA <- function() {
   # for ez, case ID should be a factor:
   LC4aov$participant <- as.factor(LC4aov$participant)
   print(ez::ezANOVA(data=LC4aov, wid=participant, dv=reachdeviation, within=block,between=c(group),type=3))
+  
+  # post-hocs to determine significance stars in figure 3...?
+  aov4contrasts <- aov(reachdeviation ~ participant + group + block, data=LC4aov)
+  TukeyHSD(aov4contrasts, which=2)
   
 }
 
