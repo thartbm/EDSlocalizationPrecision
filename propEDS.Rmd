@@ -219,7 +219,7 @@ Now the interesting part. We've mostly not seen any differences between the two 
 
 We start with plotting and looking at the precision data:
 
-```{r fig.width=8, fig.height=2.85}
+```{r fig.width=8, fig.height=4.6}
 plotLocalizationPrecision(target='inline')
 ```
 
@@ -251,7 +251,7 @@ It also seems that the difference between active and passive is mostly the same 
 
 So if the precision of limb localization is lower in the EDS group, then perhaps there is a relationship between EDS indicators and the precision of limb localization. We use Beighton scores as a hypermobility index, measured in both groups, and test if this is correlated with overall localization variance (variance is now calculated across all 4 conditions for every participant - providing more power). First, let's plot this data, with a linear regression:
 
-```{r fig.width=4, fig.height=4}
+```{r fig.width=6.5, fig.height=4}
 plotBeightonLocSTD(target='inline')
 ```
 
