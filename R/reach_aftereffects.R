@@ -313,14 +313,14 @@ plotReachAftereffects <- function(target='inline') {
       
       polygon(Xpol, Ypol, col=as.character(styles$color_trans[groupno]), border=NA)
       #polygon(coord.x, coord.y, col=as.character(styles$color_trans[groupno]), border=NA)
-      lines(Xoffsets, rep(means[cond_no], 2), col=as.character(styles$color_solid[groupno]))
+      lines(Xoffsets, rep(means[cond_no], 2), col=as.character(styles$color_solid[groupno]),lw=2)
       
     }
     
     # group significance line:
     xpoints <- c(1,2) + (groupno / 2) - 0.75
-    lines(xpoints,rep((groupno*5)+15,2),col='#999999')
-    text(mean(xpoints),(groupno*5)+17.5,'*',cex=2,col='#999999')
+    lines(xpoints,rep((groupno*6)+15,2),col='#999999',lw=1)
+    text(mean(xpoints)+((groupno-1.5)/4),(groupno*6)+18,'*',cex=2,col='#999999')
     
   }
   

@@ -1,3 +1,6 @@
+source('R/common.R')
+
+
 # Data Handling -----
 
 getLocalization <- function(groups=c('sEDS', 'zEDS')) {
@@ -1355,7 +1358,7 @@ plotLocalizationPrecision <- function(target='inline') {
       
       polygon(Xpol, Ypol, col=as.character(styles$color_trans[groupno]), border=NA)
       meLV <- avgLocStd$std[which(avgLocCI$group == group & avgLocCI$rotated == 0)]
-      lines(Xoffsets, rep(meLV[cond_no], 2), col=as.character(styles$color_solid[groupno]))
+      lines(Xoffsets, rep(meLV[cond_no], 2), col=as.character(styles$color_solid[groupno]),lw=2)
       
     }
     
@@ -1363,8 +1366,8 @@ plotLocalizationPrecision <- function(target='inline') {
   
   # only passive:
   xpos <- 2 + (c(1,2)/2) - 0.75
-  lines(xpos,rep(9.5,2),col='#999999')
-  text(mean(xpos),10,'*',cex=2,col='#999999')
+  lines(xpos,rep(10,2),col='#999999')
+  text(mean(xpos),11,'*',cex=2,col='#999999')
   
   axis(side=1,at=c(1,2),labels=c('active','passive'))
   axis(side=2,at=seq(0,12,4))
@@ -1405,7 +1408,7 @@ plotLocalizationPrecision <- function(target='inline') {
       
       polygon(Xpol, Ypol, col=as.character(styles$color_trans[groupno]), border=NA)
       meLV <- avgLocStd$std[which(avgLocCI$group == group & avgLocCI$rotated == 1)]
-      lines(Xoffsets, rep(meLV[cond_no], 2), col=as.character(styles$color_solid[groupno]))
+      lines(Xoffsets, rep(meLV[cond_no], 2), col=as.character(styles$color_solid[groupno]),lw=2)
       
     }
     
@@ -1428,8 +1431,8 @@ plotLocalizationPrecision <- function(target='inline') {
   for (condno in c(1,2)) {
     
     xpos <- condno + (c(1,2)/2) - 0.75
-    lines(xpos,rep(9.5,2),col='#999999')
-    text(mean(xpos),10,'*',cex=2,col='#999999')
+    lines(xpos,rep(10,2),col='#999999')
+    text(mean(xpos),11,'*',cex=2,col='#999999')
     
   }
   

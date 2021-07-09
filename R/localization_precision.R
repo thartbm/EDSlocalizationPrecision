@@ -444,7 +444,7 @@ plotBeightonLocSTD <- function(target='inline') {
     polygon(c(Xoffsets, rev(Xoffsets)), y = rep(CI, each=2),
             col=as.character(styles$color_trans[group_no]),
             border=NA)
-    lines(x=Xoffsets, y=rep(avg,2), col=col)
+    lines(x=Xoffsets, y=rep(avg,2), col=col, lw=2)
     
     
   }
