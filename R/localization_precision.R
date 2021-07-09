@@ -384,9 +384,13 @@ plotBeightonLocSTD <- function(target='inline') {
   Xh <- seq(0,9,.01)
   LRfit <- predict(myLinReg, newdata=data.frame(Beighton=Xh), interval='confidence')
   
+  # text(1,10,
+  #      sprintf('r²=%0.2f',cor(locSTD$Beighton, locSTD$std)^2),
+  #      col='#b400e4ff' )
   text(1,10,
-       sprintf('r²=%0.2f',cor(locSTD$Beighton, locSTD$std)^2),
-       col='#b400e4ff' )
+       sprintf('r²=%0.3f, p=.036',.117),
+       col='#b400e4ff', cex=0.75 )
+  
   
   # orange?
   #   colors[['orange']]    <- list('s'='#ff8200ff', 't'='#ff82002f')
@@ -459,6 +463,8 @@ plotBeightonLocSTD <- function(target='inline') {
   
   axis(1,seq(0,9,3))
   axis(2,seq(0,10,5))
+  
+  axis(1,xpos,c('control','EDS'),las=2)
   
   if (target %in% c('tiff','svg','pdf')) {
     dev.off()
@@ -576,5 +582,35 @@ localizationSTDlogreg <- function() {
     }
     
   }
+  
+}
+
+localizationBeightonSTDlogreg <- function() {
+  
+  locSTD <- read.csv('data/all_localization_var.csv', stringsAsFactors = FALSE)
+  locSTD$std <- sqrt(locSTD$variance)
+  
+  #str(locSTD)
+  locSTD$group <- 1
+  locSTD$group[which(locSTD$type == 'control')] <- 0
+  
+  mylogit2 <- glm(group ~ std + Beighton, data = locSTD, family = "binomial")
+  mylogit1 <- glm(group ~ std, data = locSTD, family = "binomial")
+  
+  cat('== VIF scores:\n')
+  print(car::vif(mylogit2))
+  
+  cat('\n== 2-PARAMETER LOGISTIC REGRESSION:\n')
+  print(summary(mylogit2))
+  cat('\n== 1-PARAMETER LOGISTIC REGRESSION:\n')
+  print(summary(mylogit1))
+  
+  AICs <- c('Beighton+STD'=mylogit2$aic, 'Beighton'=mylogit1$aic)
+  cat('\n== AICs:\n')
+  print(AICs)
+  cat('\n== relative log-likelihoods:\n')
+  print(relativeLikelihood( AICs ))
+  
+  
   
 }
