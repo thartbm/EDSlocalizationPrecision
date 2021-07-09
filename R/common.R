@@ -327,3 +327,9 @@ rePlotMethodsFigX <- function(target='inline', fig=1) {
   }
 
 }
+
+# Relative log-likelihoods -----
+
+relativeLikelihood <- function(crit) {
+  return( exp( ( min( crit  ) - crit  ) / 2 ) )
+}
