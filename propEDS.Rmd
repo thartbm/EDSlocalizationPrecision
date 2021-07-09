@@ -7,8 +7,8 @@ author:
 output:
   html_document:
     df_print: paged
-  pdf_document: default
   word_document: default
+  pdf_document: default
 ---
 
 # Overview
@@ -147,7 +147,7 @@ There is an effect of training session (aligned or rotated), so that we can say 
 # Reach Aftereffects in people with EDS and Controls
 
 First a figure:
-```{r fig.width=5.5, fig.height=5.5}
+```{r fig.width=6.5, fig.height=5.5}
 plotReachAftereffects(target='inline')
 ```
 
@@ -278,6 +278,18 @@ localizationSTDlogreg()
 ```
 
 Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting (aligned active). This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull _clinical_ predictor of EDS.
+
+## Alternative: Predict group from Beighton scores and localization variance
+
+Here is an alternative approach to this. The regression is not super strong, and it could be that being in the EDS group causes both higher Beighton scores as well as higher localization variance. It would make sense that we can predict group (control vs. EDS) from Beighton scores, as Beighton scores are actually used to diagnose people as having EDS (i.e. using Beighton scores to predict group is circular). However if they share the same source, two things would be true: the two would have high collinearity, and adding localization variance to a classifier to predict group based on Beighton scores would not be better than only predicting group based on Beighton score.
+
+```{r}
+localizationBeightonSTDlogreg()
+```
+
+
+We see the VIF (1.008192) which is not very high at all. And the model comparison between the two logistic regressions (predicting group based on Beighton scores alone or based on Beighton scores and localization variance) with a relative log likelihood based on the AIC of both models (taking parameter number into account) shows that the model that uses localization variance as well is better than the model using only Beighton scores. Including localization variance lowers the AIC from 37.8 to 19.1 (p<.001). This means that localization variance might tap into different aspects of EDS that are not purely the same hypermobility.
+
 
 # Summary
 
