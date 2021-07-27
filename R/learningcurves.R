@@ -49,7 +49,7 @@ getParticipantLearningCurve <- function(participant) {
   alignedReachAngles <- getReachAngles(alignedreachfile)
   
   # aligned reaches need to be boiled down to simple biases, one for each target angle
-  # for now we will use the final one third of each set
+  # for now we will use the final one third of each set   
   alignedBiases <- getAlignedBiases(alignedReachAngles)
   
   #str(alignedReachAngles$trial)
