@@ -219,15 +219,8 @@ getLocalizationForANOVA <- function(groups=c('sEDS','zEDS')) {
     
     df <- read.csv(sprintf('data/%s_localization.csv',group),stringsAsFactors=FALSE)
 
-    
-    # # do baseline correction and throw out stuff beyond +/- 20 degrees:
-    # df <- correctLocalizationsP3(df)
-    # 
     # throw out rows where either hand or tap is missing
     df <- df[is.finite(df$hand_angle) & is.finite(df$tap_angle),]
-    
-    # # only -20 : 20 degrees
-    # df <- df[(df$hand-df$arc > -20) & (df$hand-df$arc < 20),]
     
     # collect all data for the group in one dataframe:
     outdf <- data.frame()
@@ -887,16 +880,6 @@ plotLocalizationShifts <- function(target='inline') {
   }
   
   
-  #par(mar=c(4,4,2,0.1))
-  
-  # 1   2
-  # 3 4 5
-  # 6 7 8
-  # layout(matrix(c(1,1,1,2,2,2,3,3,4,4,5,5,6,6,7,7,8,8), nrow=3, ncol=6, byrow = TRUE))
-  
-  # 1   2
-  # 3   4
-  # 5 6 7
   layout(matrix(c(1,2,3,4), nrow=2, ncol=2, byrow = TRUE))
   
   par(mar=c(3,3,2,0.1), cex=1, cex.main=1, cex.axis=0.85, cex.lab=0.85, mgp=c(3,.75,0))
