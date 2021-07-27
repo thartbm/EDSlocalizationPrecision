@@ -5,10 +5,10 @@ author:
 - Bernard Marius 't Hart
 - Denise Y.P. Henriques
 output:
-  html_document:
-    df_print: paged
   word_document: default
   pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 # Overview
@@ -255,41 +255,22 @@ So if the precision of limb localization is lower in the EDS group, then perhaps
 plotBeightonLocSTD(target='inline')
 ```
 
-This looks like there is some relationship between the two variables, and this is confirmed by a Pearson correlation:
+This looks like there is some relationship between the two variables, and this is confirmed by a Pearson correlation (first for all participants, then separately for the two groups):
 
 ```{r}
 correlateBeightonLocSTD()
 ```
 
-# Predict EDS from hand localization precision
+## Predict group (EDS vs. Control) from Beighton scores and localization variance
 
-This raises the question of whether or not EDS can be predicted from hand localization variance. The figure above shows there are quite a few people with EDS that are in the range of the control group though, so this might not be the case. However, with the localization variance calculated across all 4 conditions it does work to some extent:
-
-```{r}
-predictGroupBYlocvar()
-```
-
-Although I'm not using a training/test data split here which would be more appropriate, and perhaps we can make use of some other predictors as well (e.g. train a random forest that can make use of localization variance, and compare it to one that can not use localization variance), but all of this would require a lot more data (participants).
-
-We can explore one issue with such a test: it would be best if it were cheap / easy to do. Training on a visuomotor rotation takes time, so the data from the rotated session might not be useful. Additionally, the passive localization requqires an expensive piece of equipment, which may be prohibitive. Therefore we should test how well predicting the group (people with EDS vs. controls) from localization variance works within each of the four hand localization conditions:
-
-```{r}
-localizationSTDlogreg()
-```
-
-Unfortunately, the predictions are useless in the condition that would be most easily used in a diagnostic setting (aligned active). This is still done without training/test data splits, and still ignores co-predictors, which could reduce and increase power respectively. Nevertheless, at first glance, it seems that using hand localization precision is not a usefull _clinical_ predictor of EDS.
-
-## Alternative: Predict group from Beighton scores and localization variance
-
-Here is an alternative approach to this. The regression is not super strong, and it could be that being in the EDS group causes both higher Beighton scores as well as higher localization variance. It would make sense that we can predict group (control vs. EDS) from Beighton scores, as Beighton scores are actually used to diagnose people as having EDS (i.e. using Beighton scores to predict group is circular). However if they share the same source, two things would be true: the two would have high collinearity, and adding localization variance to a classifier to predict group based on Beighton scores would not be better than only predicting group based on Beighton score.
+The regression is not super strong, and is not present in the separate groups - likely because of low power. It could be that being in the EDS group causes both higher Beighton scores as well as higher localization variance. It would make sense that we can predict group (control vs. EDS) from Beighton scores, as Beighton scores are actually used to diagnose people as having EDS (i.e. using Beighton scores to predict group is circular). However if they share the same source, two things would be true: the two would have high collinearity, and adding localization variance to a classifier to predict group based on Beighton scores would not be better than only predicting group based on Beighton score. So we test both here.
 
 ```{r}
 localizationBeightonSTDlogreg()
 ```
 
 
-We see the VIF (1.008192) which is not very high at all. And the model comparison between the two logistic regressions (predicting group based on Beighton scores alone or based on Beighton scores and localization variance) with a relative log likelihood based on the AIC of both models (taking parameter number into account) shows that the model that uses localization variance as well is better than the model using only Beighton scores. Including localization variance lowers the AIC from 37.8 to 19.1 (p<.001). This means that localization variance might tap into different aspects of EDS that are not purely the same hypermobility.
-
+We see the VIF (1.008192) which is not very high at all, suggesting the two variables provide different information about the participants. And the model comparison between the two logistic regressions (predicting group based on Beighton scores alone or based on Beighton scores and localization variance) with a relative log likelihood based on the AIC of both models (taking parameter number into account) shows that the model that uses localization variance as well is better than the model using only Beighton scores. Including localization variance lowers the AIC from 37.8 to 19.1 (p<.001). This means that localization variance might tap into different aspects of EDS that are not purely the same hypermobility. This means that the regression shown above (and in the paper) is not merely due to a group effect.
 
 # Summary
 
@@ -304,7 +285,7 @@ Here is a list of findings / results:
 This rules out many alternative explanations for the interesting findings:
 
 - The EDS group was less precise in hand localization compared to the control group, except perhaps in the aligned/active condition (as predicted / confirming our earlier paper).
-- Beighton scores predict overall hand localization precision (across both groups), and while hand localization precision has some predictive power of which group a participant is in, it's differentiation is not great.
+- Beighton scores predict overall hand localization precision (across both groups), and hand localization precision ads some predictive power. However, on it's own hand localization precision does not differentiate well between people in the control and EDS group.
 
 # Store figures
 
