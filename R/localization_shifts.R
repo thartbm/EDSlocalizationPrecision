@@ -1274,7 +1274,7 @@ plotLocalizationPrecision <- function(target='inline') {
     svglite::svglite(file='doc/Fig6.svg', width=fw, height=fh, scaling=1, fix_text_size = FALSE)
   }
   if (target == 'tiff') {
-    tiff(filename='doc/Fig6.tiff',width=fw*1200,height=fh*1200,units='px',type='cairo',compression='lzw',res=1200)
+    tiff(filename='doc/Fig6.tiff',width=fw*1150,height=fh*1150,units='px',type='cairo',compression='lzw',res=1200)
   }
   if (target == 'pdf') {
     pdf(file='doc/Fig6.pdf',width=fw,height=fh)
