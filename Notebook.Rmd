@@ -270,7 +270,7 @@ localizationBeightonSTDlogreg()
 ```
 
 
-We see the VIF (1.008192) which is not very high at all, suggesting the two variables provide different information about the participants. And the model comparison between the two logistic regressions (predicting group based on Beighton scores alone or based on Beighton scores and localization variance) with a relative log likelihood based on the AIC of both models (taking parameter number into account) shows that the model that uses localization variance as well is better than the model using only Beighton scores. Including localization variance lowers the AIC from 37.8 to 19.1 (p<.001). This means that localization variance might tap into different aspects of EDS that are not purely the same hypermobility. This means that the regression shown above (and in the paper) is not merely due to a group effect.
+We see the VIF (1.008192) which is not very high at all, suggesting the two variables provide different information about the participants. And the model comparison between the two logistic regressions (predicting group based on Beighton scores alone or based on Beighton scores and localization variance) with a relative log likelihood based on the AIC of both models (taking parameter number into account) shows that the model based on Beighton scores alone, does slighty better, but this is not significant (p=.674). This means that localization precision does not add information to Beighton scores that could be used for diagnosis.
 
 # Summary
 
@@ -285,7 +285,7 @@ Here is a list of findings / results:
 This rules out many alternative explanations for the interesting findings:
 
 - The EDS group was less precise in hand localization compared to the control group, except perhaps in the aligned/active condition (as predicted / confirming our earlier paper).
-- Beighton scores predict overall hand localization precision (across both groups), and hand localization precision ads some predictive power. However, on it's own hand localization precision does not differentiate well between people in the control and EDS group.
+- Beighton scores predict overall hand localization precision (across both groups), but hand localization precision does not add information that can be used to differentiate between people with EDS and healthy controls.
 
 # Store figures
 
