@@ -595,7 +595,7 @@ localizationBeightonSTDlogreg <- function() {
   locSTD$group[which(locSTD$type == 'control')] <- 0
   
   mylogit2 <- glm(group ~ std + Beighton, data = locSTD, family = "binomial")
-  mylogit1 <- glm(group ~ std, data = locSTD, family = "binomial")
+  mylogit1 <- glm(group ~ Beighton, data = locSTD, family = "binomial")
   
   cat('== VIF scores:\n')
   print(car::vif(mylogit2))
